@@ -24,5 +24,9 @@ class PathHelper:
         root = os.path.dirname(os.path.dirname(__file__))
         return os.path.join(root, './dataset/train/', type, sample_name)
         
-        
-
+    @staticmethod    
+    def get_plot_path(subfolder_name):
+        root = os.path.dirname(os.path.dirname(__file__))
+        fullpath = os.path.join(root, 'notebooks/plots/', subfolder_name)     
+        os.makedirs(fullpath, exist_ok=True)
+        return fullpath    
