@@ -36,6 +36,9 @@ def get_stable_input_path():
     """Return the path to the directory containing stable diffusion input images."""
     return os.path.join(get_project_root(), "dataset/images/stable-diffusion/input")
 
+def get_all_files_from_folder(folder_path):
+    files = os.listdir(folder_path)
+    return files
 
 class PATH_TYPE:
     classifier = 'classifier'

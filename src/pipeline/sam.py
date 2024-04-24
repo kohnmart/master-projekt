@@ -96,10 +96,14 @@ class SAM:
         return separated_images
     
 
-    def show_sample_with_bboxes(self, masks, image, name):
-        for mask in masks:
+    def show_sample_with_bboxes(self, masks, image, name, probs):
+
+        for i, mask in enumerate(masks):
             x, y, w, h = mask['bbox']
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255,0), 3)
-            
-            to_save_image = Image.fromarray(image)
-            to_save_image.save(name)
+            cv2.putText(image, probs[i], (x,y-5), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,255,0), 1)
+        to_save_image = Image.fromarray(image)
+
+        path = './output/' + name
+
+        to_save_image.save(path)
