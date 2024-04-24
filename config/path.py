@@ -20,17 +20,24 @@ def get_evaluation_path():
     """Return the path to the evaluation directory."""
     return os.path.join(get_project_root(), 'src/evaluation')
 
-def get_training_data_path(file_name=None):
-    """Return the path to the directory containing training data."""
-    train_path = os.path.join(get_project_root(), "dataset/train")
+def get_checkpoint_path(name=None):
+    checkpoint_path = os.path.join(get_project_root(), f'src/model_weights/${name}')
+    return checkpoint_path
 
-    folder_name = file_name.split("_")[0]
+def get_training_data_path(type=None,file_name=None):
+    """Return the path to the directory containing training data."""
+    train_path = os.path.join(get_project_root(), f"dataset/{type}/train")
 
     if file_name:
-        train_path = os.path.join(train_path, folder_name, file_name)
+        train_path = os.path.join(train_path, file_name)
     return train_path
 
 def get_stable_input_path():
     """Return the path to the directory containing stable diffusion input images."""
     return os.path.join(get_project_root(), "dataset/images/stable-diffusion/input")
 
+
+class PATH_TYPE:
+    classifier = 'classifier'
+    generator = 'generator'
+    segmentator = 'segmentator'
