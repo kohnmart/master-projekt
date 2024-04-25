@@ -9,7 +9,7 @@ clip_instance = ClipClassifier()
 print('Instance are setup...')
 
 file_names = []
-indexes = [f'{i:04}' for i in range(4,21)]  # Generate index strings from '0000' to '0020'
+indexes = [f'{i:04}' for i in range(0,10)]  # Generate index strings from '0000' to '0020'
 for index in indexes:
     file_names.append(f"mixed_{index}.png")
 
@@ -22,18 +22,18 @@ for sample in file_names:
 
     print('Image processed...')
 
-    cleaned_masks = sam_instance.clean_masks(masks)
-
+    cleaned_masks = sam_instance.clean_masks(masks, range=[5000, 200000])
 
     print('Masks cleaned...')
 
-    cloth_objects = sam_instance.separate_by_bbox(cleaned_masks, image)
+    cloth_objects = sam_instance.separate_by_bbox(cleaned_masks, image, True)
 
 
     print('Image classifying...')
 
 
-    probs =[]
+    probs = []
+    
     for cloth in cloth_objects:
         clip_instance.image = cloth
 

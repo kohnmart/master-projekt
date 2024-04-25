@@ -21,7 +21,7 @@ def get_evaluation_path():
     return os.path.join(get_project_root(), 'src/evaluation')
 
 def get_checkpoint_path(name=None):
-    checkpoint_path = os.path.join(get_project_root(), f'src/model_weights/${name}')
+    checkpoint_path = os.path.join(get_project_root(), f'src/pipeline/model_weights/{name}')
     return checkpoint_path
 
 def get_training_data_path(type=None,file_name=None):
@@ -34,7 +34,11 @@ def get_training_data_path(type=None,file_name=None):
 
 def get_stable_input_path():
     """Return the path to the directory containing stable diffusion input images."""
-    return os.path.join(get_project_root(), "dataset/images/stable-diffusion/input")
+    return os.path.join(get_project_root(), "dataset/generator/input")
+
+def get_stable_output_path():
+    """Return the path to the directory containing stable diffusion input images."""
+    return os.path.join(get_project_root(), "dataset/generator/output")
 
 def get_all_files_from_folder(folder_path):
     files = os.listdir(folder_path)
