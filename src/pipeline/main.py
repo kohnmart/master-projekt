@@ -1,5 +1,9 @@
 from sam import SAM
 from clip import ClipClassifier
+import numpy as np
+import time
+
+
 
 print('Launching...')
 
@@ -8,8 +12,10 @@ clip_instance = ClipClassifier()
 
 print('Instance are setup...')
 
+start_time = time.time()
+
 file_names = []
-indexes = [f'{i:04}' for i in range(0,10)]  # Generate index strings from '0000' to '0020'
+indexes = [f'{i:04}' for i in range(1,10)]  # Generate index strings from '0000' to '0020'
 for index in indexes:
     file_names.append(f"mixed_{index}.png")
 
@@ -20,17 +26,10 @@ for sample in file_names:
 
     masks, image = sam_instance.image_processor(sample)
 
-    print('Image processed...')
+    cleaned_masks = sam_instance.clean_masks(masks, range=[5000, 100000])
 
-    cleaned_masks = sam_instance.clean_masks(masks, range=[5000, 200000])
-
-    print('Masks cleaned...')
-
-    cloth_objects = sam_instance.separate_by_bbox(cleaned_masks, image, True)
-
-
-    print('Image classifying...')
-
+    cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, image, True, False)
+    
 
     probs = []
     
@@ -41,5 +40,12 @@ for sample in file_names:
         probs.append(res)
 
 
-    sam_instance.show_sample_with_bboxes(cleaned_masks, image, sample, probs)
+    sam_instance.save_sample_with_bboxes(cleaned_compared_masks, image, sample, probs)
 
+
+end_time = time.time()
+
+elapsed_time = end_time - start_time
+formatted_elapsed_time = "{:.2f}".format(elapsed_time)
+
+print("Elapsed time:", formatted_elapsed_time, "seconds")

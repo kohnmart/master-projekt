@@ -1,6 +1,5 @@
 import os
 
-
 def get_project_root():
     """Return the root directory of the project."""
     return os.path.dirname(os.path.dirname(__file__))
@@ -21,13 +20,15 @@ def get_evaluation_path():
     return os.path.join(get_project_root(), 'src/evaluation')
 
 def get_checkpoint_path(name=None):
-    checkpoint_path = os.path.join(get_project_root(), f'src/pipeline/model_weights/{name}')
+    """Return the path to the directory containing model checkpoint files."""
+    checkpoint_path = os.path.join(get_project_root(), 'src/pipeline/model_weights')
+    if name:
+        checkpoint_path = os.path.join(checkpoint_path, name)
     return checkpoint_path
 
-def get_training_data_path(type=None,file_name=None):
+def get_training_data_path(data_type=None, file_name=None):
     """Return the path to the directory containing training data."""
-    train_path = os.path.join(get_project_root(), f"dataset/{type}/train")
-
+    train_path = os.path.join(get_project_root(), f"dataset/{data_type}/train")
     if file_name:
         train_path = os.path.join(train_path, file_name)
     return train_path
@@ -37,14 +38,15 @@ def get_stable_input_path():
     return os.path.join(get_project_root(), "dataset/generator/input")
 
 def get_stable_output_path():
-    """Return the path to the directory containing stable diffusion input images."""
+    """Return the path to the directory containing stable diffusion output images."""
     return os.path.join(get_project_root(), "dataset/generator/output")
 
 def get_all_files_from_folder(folder_path):
-    files = os.listdir(folder_path)
-    return files
+    """Return a list of all files in a folder."""
+    return os.listdir(folder_path)
 
-class PATH_TYPE:
+class DATASET_PATH_TYPE:
+    """Class to define constants for different types of paths."""
     classifier = 'classifier'
     generator = 'generator'
     segmentator = 'segmentator'

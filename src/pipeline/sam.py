@@ -11,7 +11,7 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 
 # custom
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '../../')))
-from config.path import get_training_data_path, PATH_TYPE
+from config.path import get_training_data_path, DATASET_PATH_TYPE
 
 class SAM:
 
@@ -23,9 +23,9 @@ class SAM:
         sam = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
         self.mask_generator = SamAutomaticMaskGenerator(
             model=sam,
-            points_per_side=5,
+            points_per_side=10,
             pred_iou_thresh=0.90,
-            stability_score_thresh=0.96,
+            stability_score_thresh=0.90,
             crop_n_layers=1,
             crop_n_points_downscale_factor=2,
             min_mask_region_area=100,
@@ -33,37 +33,10 @@ class SAM:
 
 
     def image_processor(self, file_name):
-        
-        
-        img_path = get_training_data_path(PATH_TYPE.segmentator, file_name)
+        img_path = get_training_data_path(DATASET_PATH_TYPE.segmentator, file_name)
         image_bgr = cv2.imread(img_path)
-
-
         blurred_image = cv2.medianBlur(image_bgr, 21)
-
-        
-        #blurred_image = remove_shadow_rgb(blurred_image)
-
-
         return self.mask_generator.generate(blurred_image), image_bgr
-
-        # mask_annotator = sv.MaskAnnotator(color_lookup=sv.ColorLookup.INDEX, opacity=1.0)
-
-        # detections = sv.Detections.from_sam(sam_result=masks)
-
-        # annotated_image = mask_annotator.annotate(scene=blurred_image.copy(), detections=detections)
-
-        # # sv.plot_images_grid(
-        # #     images=[blurred_image, annotated_image],
-        # #     grid_size=(1, 2),
-        # #     titles=['source image', 'segmented image']
-        # # )
-
-        # bounding_box_annotator = sv.BoundingBoxAnnotator(color_lookup=sv.ColorLookup.INDEX)
-        # annotated_image = bounding_box_annotator.annotate(
-        #     scene=blurred_image, detections=detections)
-        # cv2.cvtColor.imshow(annotated_image)
-
 
 
     def clean_masks(self,masks, range):
@@ -75,36 +48,53 @@ class SAM:
         return masks_cleaned
         
 
-    def separate_by_bbox(self,masks_cleaned, image, with_segmentation=False):
+    def separate_by_bbox(self,masks_cleaned, image, with_segmentation=False, save_single_objects=False):
 
         separated_images = []
-
+        masks_cleaned_compared = []
         for i, ann in enumerate(masks_cleaned):
         # Extract bounding box coordinates
             x, y, width, height = map(int, ann['bbox'])  # Ensure integer values
                     
             if with_segmentation:
                 mask = np.array(ann['segmentation'], dtype=np.uint8)
-                image = cv2.bitwise_and(image, image, mask=mask)
+                si_image = image.copy()
+                si_image = cv2.bitwise_and(si_image, si_image, mask=mask)
                 
             # Crop the region from the original image
-            cropped_image = image[y:y+height, x:x+width]
+            cropped_image = si_image[y:y+height, x:x+width]
             cropped_image_bgr = cv2.cvtColor(cropped_image, cv2.COLOR_RGB2BGR)
-            separated_images.append(cropped_image_bgr)
+
+            mean = np.mean(cropped_image[0])
+            print(mean)
+            if mean > 2:
+
+                separated_images.append(cropped_image_bgr)
+                masks_cleaned_compared.append((masks_cleaned[i]))
+                to_save_image = Image.fromarray(cropped_image_bgr)
+
+                if save_single_objects:
+                    path = f'./output/v4'
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+
+                    path = path + '/' + 'test' + str(i) + '.png'
+
+                    to_save_image.save(path)
         
-        return separated_images
+        return separated_images, masks_cleaned_compared
     
 
-    def show_sample_with_bboxes(self, masks, image, name, probs):
+    def save_sample_with_bboxes(self, masks, image, name, probs):
 
         for i, mask in enumerate(masks):
             x, y, w, h = mask['bbox']
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255,0), 3)
-            cv2.rectangle(image, (x, y), (x + 50, y + -20), (255, 255, 255), -1) 
+            cv2.rectangle(image, (x, y), (x + 150, y + -20), (255, 255, 255), -1) 
             cv2.putText(image, probs[i], (x,y-5), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0,255,0), 1)
         to_save_image = Image.fromarray(image)
 
-        path = f'./output/v3'
+        path = f'./output/v4'
         if not os.path.exists(path):
             os.makedirs(path)
 
