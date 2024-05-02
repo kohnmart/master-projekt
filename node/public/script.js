@@ -5,6 +5,82 @@ const state = {
     currentIndex: 0
 };
 
+const canvas = new fabric.Canvas('c', {
+    isDrawingMode: true
+  });
+  
+
+  // Function to load an image onto the canvas
+function loadImage(url) {
+    fabric.Image.fromURL(url, function(img) {
+      // Scale image to fit canvas if it's too large
+      const imgScale = Math.min(
+        canvas.width / img.width,
+        canvas.height / img.height
+      );
+      img.scale(imgScale).set({
+        left: 10,
+        top: 10,
+        angle: 0
+      });
+      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+    });
+  }
+
+  // Function to enable rectangle drawing mode
+function enableRectangleDrawing() {
+    canvas.isDrawingMode = false; // Disable free drawing mode
+    const rect = new fabric.Rect({
+      left: 50,
+      top: 50,
+      fill: 'transparent',
+      width: 100,
+      height: 100,
+      stroke: 'red',
+      strokeWidth: 1,
+      selectable: true
+    });
+  
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+  }
+
+  function saveRectangles() {
+    const rectangles = canvas.getObjects().filter(obj => obj.type === 'rect');
+    console.log(rectangles);
+  }
+
+const saveBboxes = document.getElementById('saveBBoxes')
+saveBboxes.addEventListener('click', saveRectangles)
+
+
+  // Optional: function to clear all shapes
+function clearCanvas() {
+    canvas.getObjects().forEach((obj) => {
+      if (obj.type === 'rect') {
+        canvas.remove(obj);
+      }
+    });
+  }
+  
+const clear = document.getElementById('clearCanvas')
+clear.addEventListener('click', clearCanvas)
+
+
+  
+  // Function to toggle drawing mode
+  function toggleDrawingMode() {
+    canvas.isDrawingMode = !canvas.isDrawingMode;
+    if (canvas.isDrawingMode) {
+      // Set drawing properties if necessary
+      canvas.freeDrawingBrush.color = 'blue';
+      canvas.freeDrawingBrush.width = 5;
+      console.log('Free drawing mode activated.');
+    } else {
+      console.log('Drawing mode deactivated.');
+    }
+  }
+document.getElementById('addRectangle').addEventListener('click', enableRectangleDrawing);
 document.addEventListener('DOMContentLoaded', async () => {
     const body = document.body;
     setupButtons(body);
@@ -50,13 +126,7 @@ async function loadImages() {
 }
 
 function displayImage() {
-    const imageContainer = document.querySelector('.image-container');
-    imageContainer.innerHTML = ''; // Clear the container
-    const img = document.createElement('img');
-    img.src = `images/${state.images[state.currentIndex]}`;
-    img.classList.add('image-item');
-    imageContainer.appendChild(img);
-    updateImageCounter();
+    loadImage(`images/${state.images[state.currentIndex]}`)
 }
 
 function updateImageCounter() {
@@ -67,14 +137,47 @@ function updateImageCounter() {
 }
 
 function nextImage() {
+
+    uploadBBoxes()
     state.currentIndex = (state.currentIndex + 1) % state.images.length;
     displayImage();
+    clearCanvas()
 }
 
 function prevImage() {
     state.currentIndex = (state.currentIndex - 1 + state.images.length) % state.images.length;
     displayImage();
+    uploadBBoxes()
+    clearCanvas()
 }
+
+async function uploadBBoxes() {
+  try {
+    // Filter only rectangle objects from the canvas
+    var rectangles = canvas.getObjects().filter(obj => obj.type === 'rect');
+    if (rectangles.length != 0)
+    {
+    const updatedRectangles = rectangles.map(rect => ({
+      type: rect.type,
+      originX: rect.originX,
+      originY: rect.originY,
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+      scaleX: rect.scaleX,
+      scaleY: rect.scaleY,
+  }));
+  
+    // Post the data to the server
+    await axios.post('/canvas', { canvas: [state.images[state.currentIndex], updatedRectangles] });
+}
+  } catch (error) {
+    // Log or handle errors
+    console.error('Error uploading rectangles:', error);
+  }
+}
+
 
 async function imageDelete() {
     try {
