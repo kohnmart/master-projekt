@@ -27,8 +27,6 @@ const post = async (bboxes) => {
   try {
     await mongoose.connect(URI, {
       dbName: 'detex-ai',
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
     });
 
     console.log('Connected to MongoDB');
@@ -59,8 +57,6 @@ const deleteAll = async (sample_id) => {
   try {
     await mongoose.connect(URI, {
       dbName: 'detex-ai',
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
     });
 
     const res = await Model.deleteMany({ sample_id: sample_id });
@@ -77,8 +73,6 @@ const getAll = async (sample_id) => {
   try {
     await mongoose.connect(URI, {
       dbName: 'detex-ai',
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
     });
 
     const res = await Model.find({ sample_id: sample_id });
