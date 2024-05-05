@@ -22,6 +22,7 @@ document
 document.addEventListener('DOMContentLoaded', async () => {
   //setupButtons(document.body);
   setupKeyboardNavigation();
+  addClothTypes();
   await loadImages();
   displayImage();
 });
@@ -45,6 +46,28 @@ function setupKeyboardNavigation() {
     else if (event.key === 'ArrowLeft') prevImage();
     else if (event.key === 'ArrowDown') imageDelete();
   });
+}
+
+function addClothTypes() {
+  const clothes = [
+    'Jacket',
+    'Shirt',
+    'T-Shirt',
+    'Polo',
+    'Dress',
+    'Pant',
+    'Short',
+  ];
+  const actions = document.getElementById('actions');
+  const div = document.createElement('div');
+
+  clothes.forEach((cloth) => {
+    const button = document.createElement('button');
+    button.textContent = cloth;
+    div.appendChild(button);
+  });
+
+  actions.appendChild(div);
 }
 
 document

@@ -33,8 +33,7 @@ const post = async (bboxes) => {
 
     for (const bbox of bboxes) {
       let boundingBox;
-
-      if (bbox._id) {
+      if (bbox._id != '') {
         boundingBox = await Model.findByIdAndUpdate(bbox._id, bbox, {
           new: true,
         });

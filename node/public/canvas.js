@@ -8,6 +8,7 @@ const canvas = new fabric.Canvas('c', {
 
 function enableRectangleDrawing() {
   const rect = new fabric.Rect({
+    id: '',
     left: 250,
     top: 250,
     fill: 'transparent',
@@ -17,8 +18,24 @@ function enableRectangleDrawing() {
     strokeWidth: 1,
     selectable: true,
   });
-  canvas.add(rect);
-  canvas.setActiveObject(rect);
+
+  const label = new fabric.Text('Label', {
+    fontSize: 20,
+    left: rect.left + 25,
+    top: rect.top + 20,
+    originX: 'center',
+    originY: 'center',
+    strokeWidth: 1,
+    fill: 'red',
+  });
+
+  const group = new fabric.Group([rect, label], {
+    left: 150,
+    top: 150,
+  });
+
+  canvas.add(group);
+  canvas.setActiveObject(group);
 }
 
 function clearCanvas() {
@@ -35,9 +52,9 @@ function deleteFromCanvas() {
 async function loadBoundingBoxes(sample_id) {
   try {
     const data = await fetchBboxes(sample_id);
-    console.log(data['bboxes']);
     data['bboxes'].forEach((bbox) => {
       const rect = new fabric.Rect({
+        id: bbox._id,
         left: bbox.left,
         top: bbox.top,
         width: bbox.width,
@@ -48,6 +65,7 @@ async function loadBoundingBoxes(sample_id) {
         stroke: 'red',
         strokeWidth: 2,
       });
+      console.log();
       canvas.add(rect);
       canvas.setActiveObject(rect);
     });
@@ -61,7 +79,7 @@ async function saveBoundingBoxes() {
     const rectangles = canvas.getObjects().filter((obj) => obj.type === 'rect');
     if (rectangles.length !== 0) {
       const updatedRectangles = rectangles.map((rect) => ({
-        id: rect.id,
+        _id: rect.id,
         sample_id: rect.sample_id ?? state.images[state.currentIndex],
         type: rect.type,
         originX: rect.originX,

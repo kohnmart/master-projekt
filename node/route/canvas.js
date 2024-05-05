@@ -1,7 +1,7 @@
 // routes/canvasRoutes.js
 const express = require('express');
 const router = express.Router();
-const BoundingBox = require('../mongo/bounding');
+const BoundingBox = require('../mongo/mongodb');
 
 router.put('/canvas', async (req, res) => {
   const canvas = req.body.canvas;
