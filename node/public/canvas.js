@@ -9,33 +9,18 @@ const canvas = new fabric.Canvas('c', {
 function enableRectangleDrawing() {
   const rect = new fabric.Rect({
     id: '',
-    left: 250,
-    top: 250,
+    left: 0,
+    top: 0,
     fill: 'transparent',
     width: 200,
     height: 200,
     stroke: 'red',
     strokeWidth: 1,
     selectable: true,
+    label: '',
   });
-
-  const label = new fabric.Text('Label', {
-    fontSize: 20,
-    left: rect.left + 25,
-    top: rect.top + 20,
-    originX: 'center',
-    originY: 'center',
-    strokeWidth: 1,
-    fill: 'red',
-  });
-
-  const group = new fabric.Group([rect, label], {
-    left: 150,
-    top: 150,
-  });
-
-  canvas.add(group);
-  canvas.setActiveObject(group);
+  canvas.add(rect);
+  canvas.setActiveObject(rect);
 }
 
 function clearCanvas() {
@@ -64,8 +49,8 @@ async function loadBoundingBoxes(sample_id) {
         fill: 'transparent',
         stroke: 'red',
         strokeWidth: 2,
+        label: bbox.label,
       });
-      console.log();
       canvas.add(rect);
       canvas.setActiveObject(rect);
     });
@@ -90,6 +75,7 @@ async function saveBoundingBoxes() {
         height: rect.height,
         scaleX: rect.scaleX,
         scaleY: rect.scaleY,
+        label: rect.label,
       }));
       await axios.put('/canvas', { canvas: [updatedRectangles] });
     }

@@ -13,6 +13,7 @@ const boundingSchema = new mongoose.Schema(
     height: { type: Number, required: true },
     scaleX: { type: Number, required: true },
     scaleY: { type: Number, required: true },
+    label: { type: String, required: true },
   },
   { timestamps: true }
 ); // Enable timestamps for createdAt and updatedAt
@@ -28,7 +29,7 @@ const post = async (bboxes) => {
     await mongoose.connect(URI, {
       dbName: 'detex-ai',
     });
-
+    console.log(bboxes);
     console.log('Connected to MongoDB');
 
     for (const bbox of bboxes) {
