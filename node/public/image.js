@@ -1,10 +1,12 @@
-import { fetchImages } from './fetch.js';
+import { fetchImages, deleteBboxes } from './fetch.js';
 import { clearCanvas, loadBoundingBoxes, canvas } from './canvas.js';
 
 const state = {
   images: [],
   currentIndex: 0,
 };
+
+let counter = '';
 
 function displayImage() {
   loadImage(`images/${state.images[state.currentIndex]}`);
@@ -15,6 +17,7 @@ function nextImage() {
   displayImage();
   clearCanvas();
   loadBoundingBoxes(state.images[state.currentIndex]);
+  counter.textContent = `${state.currentIndex} / ${state.images.length}`;
 }
 
 function prevImage() {
@@ -23,10 +26,13 @@ function prevImage() {
   displayImage();
   clearCanvas();
   loadBoundingBoxes(state.images[state.currentIndex]);
+  counter.textContent = `${state.currentIndex} / ${state.images.length}`;
 }
 
 async function imageDelete() {
   try {
+    deleteBboxes(state.images[state.currentIndex]);
+    clearCanvas();
     await axios.delete(`/images/${state.images[state.currentIndex]}`);
     state.images.splice(state.currentIndex, 1);
     if (state.images.length === 0) {
@@ -34,6 +40,7 @@ async function imageDelete() {
       return;
     }
     nextImage();
+    counter.textContent = `${state.currentIndex} / ${state.images.length - 1}`;
     alert('Image deleted successfully!');
   } catch (error) {
     console.error('Error deleting image:', error);
@@ -42,6 +49,7 @@ async function imageDelete() {
 }
 
 function loadImage(url) {
+  counter = document.getElementById('counter');
   fabric.Image.fromURL(url, function (img) {
     const imgScale = Math.min(
       canvas.width / img.width,
@@ -55,7 +63,6 @@ function loadImage(url) {
 async function loadImages() {
   try {
     state.images = await fetchImages();
-    console.log(state.images);
   } catch (error) {
     console.error('Failed to load images:', error);
   }

@@ -4,6 +4,7 @@ import {
   prevImage,
   imageDelete,
   loadImages,
+  state,
 } from './image.js';
 
 import {
@@ -13,6 +14,8 @@ import {
   saveBoundingBoxes,
 } from './canvas.js';
 
+const sampleLengthTotalElement = document.createElement('p');
+sampleLengthTotalElement.id = 'counter';
 const clear = document.getElementById('clearCanvas');
 clear.addEventListener('click', deleteFromCanvas);
 
@@ -24,6 +27,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupKeyboardNavigation();
   addClothTypes();
   await loadImages();
+  sampleLengthTotalElement.textContent = `0 / ${state.images.length}`;
+  actions.appendChild(sampleLengthTotalElement);
   displayImage();
 });
 
