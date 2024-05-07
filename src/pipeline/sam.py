@@ -22,29 +22,46 @@ class SAM:
 
         sam = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
         self.mask_generator = SamAutomaticMaskGenerator(
-            model=sam,
-            points_per_side=10,
-            pred_iou_thresh=0.90,
-            stability_score_thresh=0.90,
-            crop_n_layers=1,
-            crop_n_points_downscale_factor=2,
-            min_mask_region_area=100,
+        model=sam,
+        points_per_side=5,
+        pred_iou_thresh=0.96,
+        stability_score_thresh=0.96,
+        crop_n_layers=1,
+        crop_n_points_downscale_factor=2,
+        min_mask_region_area=100,  # Requires open-cv to run post-processing
         )
 
+    def remove_shadow_rgb(self, image):
+        # Convert image to RGB if it isn't already
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if image.shape[-1] == 3 else image
+        # Convert to YCrCb color space
+        ycrcb = cv2.cvtColor(rgb, cv2.COLOR_RGB2YCrCb)
+        # Split into channels
+        y, cr, cb = cv2.split(ycrcb)
+        # Apply histogram equalization on the brightness channel
+        y_eq = cv2.equalizeHist(y)
+        # Merge back the channels
+        ycrcb_eq = cv2.merge((y_eq, cr, cb))
+        # Convert back to RGB
+        result = cv2.cvtColor(ycrcb_eq, cv2.COLOR_YCrCb2RGB)
+        return result
 
     def image_processor(self, file_name):
         img_path = get_training_data_path(DATASET_PATH_TYPE.segmentator, file_name)
         image_bgr = cv2.imread(img_path)
-        blurred_image = cv2.medianBlur(image_bgr, 21)
-        return self.mask_generator.generate(blurred_image), image_bgr
+        image_ycrcb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2YCrCb)
+        blurred_image = cv2.medianBlur(image_ycrcb, 21)
+        processed_image = self.remove_shadow_rgb(blurred_image) 
+
+        return self.mask_generator.generate(processed_image), image_bgr
 
 
     def clean_masks(self,masks, range):
         masks_cleaned = []
         for mask in masks: 
-            if np.mean(mask['segmentation'][3]) <= 0.2 and (mask['area'] >= range[0] and mask['area'] <= range[1]):
+            if mask['area'] >= range[0] and mask['area'] <= range[1]:
                 masks_cleaned.append(mask)
-
+                print(mask)
         return masks_cleaned
         
 
@@ -66,8 +83,7 @@ class SAM:
             cropped_image_bgr = cv2.cvtColor(cropped_image, cv2.COLOR_RGB2BGR)
 
             mean = np.mean(cropped_image[0])
-            print(mean)
-            if mean > 2:
+            if mean < 230:
 
                 separated_images.append(cropped_image_bgr)
                 masks_cleaned_compared.append((masks_cleaned[i]))

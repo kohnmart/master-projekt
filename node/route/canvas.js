@@ -47,4 +47,17 @@ router.get('/canvas/:id', async (req, res) => {
   }
 });
 
+router.get('/canvas', async (req, res) => {
+  try {
+    // Iterate over each bounding box
+    bboxes = await BoundingBox.getAllEntries();
+    // Respond with success message
+    res.status(200).json({ bboxes });
+  } catch (error) {
+    // If an error occurs, respond with an error message
+    console.error('Error updating or creating canvas data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;

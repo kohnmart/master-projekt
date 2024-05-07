@@ -50,6 +50,8 @@ function addClothTypes() {
     'Dress',
     'Pant',
     'Short',
+    'Skirt',
+    'Unkown',
   ];
   const actions = document.getElementById('actions');
   const div = document.createElement('div');

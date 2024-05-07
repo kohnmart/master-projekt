@@ -15,7 +15,7 @@ print('Instance are setup...')
 start_time = time.time()
 
 file_names = []
-indexes = [f'{i:04}' for i in range(1,10)]  # Generate index strings from '0000' to '0020'
+indexes = [f'{i:04}' for i in range(21,22)]  # Generate index strings from '0000' to '0020'
 for index in indexes:
     file_names.append(f"mixed_{index}.png")
 
@@ -25,10 +25,10 @@ for sample in file_names:
     print(f"Processing: {sample}")
 
     masks, image = sam_instance.image_processor(sample)
+    print(len(masks))
+    cleaned_masks = sam_instance.clean_masks(masks, range=[10000, 200000])
 
-    cleaned_masks = sam_instance.clean_masks(masks, range=[5000, 100000])
-
-    cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, image, True, False)
+    cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, image, True, True)
     
 
     probs = []

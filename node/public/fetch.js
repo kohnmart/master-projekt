@@ -19,6 +19,17 @@ const fetchBboxes = async (id) => {
   }
 };
 
+const fetchAllBboxes = async (id) => {
+  try {
+    const url = `/canvas`;
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching images:', error);
+    alert('Error fetching images. Please try again.');
+  }
+};
+
 const deleteBboxes = async (id) => {
   try {
     const url = `/canvas/${id}`;
@@ -30,4 +41,4 @@ const deleteBboxes = async (id) => {
   }
 };
 
-export { fetchImages, fetchBboxes, deleteBboxes };
+export { fetchImages, fetchBboxes, deleteBboxes, fetchAllBboxes };

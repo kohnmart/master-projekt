@@ -65,7 +65,6 @@ const deleteAll = async (sample_id) => {
     console.log('Error on Delete', err);
   } finally {
     await mongoose.connection.close();
-    console.log('MongoDB connection closed');
   }
 };
 
@@ -76,14 +75,27 @@ const getAll = async (sample_id) => {
     });
 
     const res = await Model.find({ sample_id: sample_id });
-    console.log(res);
     return res;
   } catch (err) {
     console.error('Error fetching all rectangles:', err);
   } finally {
     await mongoose.connection.close();
-    console.log('MongoDB connection closed');
   }
 };
 
-module.exports = { Model, post, getAll, deleteAll };
+const getAllEntries = async () => {
+  try {
+    await mongoose.connect(URI, {
+      dbName: 'detex-ai',
+    });
+
+    const res = await Model.find().toArray();
+    return res;
+  } catch (err) {
+    console.error('Error fetching all rectangles:', err);
+  } finally {
+    await mongoose.connection.close();
+  }
+};
+
+module.exports = { Model, post, getAll, getAllEntries, deleteAll };

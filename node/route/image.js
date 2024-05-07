@@ -8,7 +8,6 @@ router.get('/images', (req, res) => {
   try {
     // Read the contents of the directory
     const images = fs.readdirSync(imagesDir);
-    console.log(images);
     res.json(images);
   } catch (error) {
     console.error('Error reading images directory:', error);

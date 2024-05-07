@@ -16,8 +16,8 @@ function nextImage() {
   state.currentIndex = (state.currentIndex + 1) % state.images.length;
   displayImage();
   clearCanvas();
-  loadBoundingBoxes(state.images[state.currentIndex]);
   counter.textContent = `${state.currentIndex} / ${state.images.length}`;
+  loadBoundingBoxes(state.images[state.currentIndex]);
 }
 
 function prevImage() {
@@ -39,6 +39,7 @@ async function imageDelete() {
       alert('No more images available.');
       return;
     }
+    state.currentIndex -= 1;
     nextImage();
     counter.textContent = `${state.currentIndex} / ${state.images.length - 1}`;
     alert('Image deleted successfully!');
