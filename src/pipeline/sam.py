@@ -61,7 +61,6 @@ class SAM:
         for mask in masks: 
             if mask['area'] >= range[0] and mask['area'] <= range[1]:
                 masks_cleaned.append(mask)
-                print(mask)
         return masks_cleaned
         
 

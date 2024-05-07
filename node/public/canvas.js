@@ -18,6 +18,7 @@ function enableRectangleDrawing() {
     strokeWidth: 1,
     selectable: true,
     label: '',
+    iou_score: 1.0,
   });
   canvas.add(rect);
   canvas.setActiveObject(rect);
@@ -44,12 +45,11 @@ async function loadBoundingBoxes(sample_id) {
         top: bbox.top,
         width: bbox.width,
         height: bbox.height,
-        scaleX: bbox.scaleX,
-        scaleY: bbox.scaleY,
         fill: 'transparent',
         stroke: 'red',
         strokeWidth: 2,
         label: bbox.label,
+        iou_score: bbox.iou_score,
       });
       canvas.add(rect);
       canvas.setActiveObject(rect);
@@ -67,15 +67,12 @@ async function saveBoundingBoxes() {
         _id: rect.id,
         sample_id: rect.sample_id ?? state.images[state.currentIndex],
         type: rect.type,
-        originX: rect.originX,
-        originY: rect.originY,
         left: rect.left,
         top: rect.top,
-        width: rect.width,
-        height: rect.height,
-        scaleX: rect.scaleX,
-        scaleY: rect.scaleY,
+        width: rect.width * rect.scaleX.toFixed(2),
+        height: rect.height * rect.scaleY.toFixed(2),
         label: rect.label,
+        iou_score: 1.0,
       }));
       await axios.put('/canvas', { canvas: [updatedRectangles] });
     }

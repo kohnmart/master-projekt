@@ -5,15 +5,12 @@ const boundingSchema = new mongoose.Schema(
     _id: { type: String, required: true }, // Use UUID v4 as default value for _id
     sample_id: { type: String, required: true },
     type: { type: String, required: true },
-    originX: { type: String, required: true },
-    originY: { type: String, required: true },
     left: { type: Number, required: true },
     top: { type: Number, required: true },
     width: { type: Number, required: true },
     height: { type: Number, required: true },
-    scaleX: { type: Number, required: true },
-    scaleY: { type: Number, required: true },
     label: { type: String, required: true },
+    iou_score: { type: Number, required: false },
   },
   { timestamps: true }
 ); // Enable timestamps for createdAt and updatedAt

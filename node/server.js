@@ -10,7 +10,7 @@ app.use(express.static('public'));
 
 app.use(
   '/images',
-  express.static(path.join(__dirname, '../dataset/generator/output'))
+  express.static(path.join(__dirname, '../dataset/segmentator/output'))
 );
 
 app.use(imageRoutes);
