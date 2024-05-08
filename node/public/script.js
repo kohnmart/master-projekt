@@ -37,6 +37,7 @@ function setupKeyboardNavigation() {
     if (event.key === 'ArrowRight') nextImage();
     else if (event.key === 'ArrowLeft') prevImage();
     else if (event.key === 'ArrowDown') imageDelete();
+    else if (event.key === 'Delete') deleteFromCanvas();
   });
 }
 const clothButtons = [];
