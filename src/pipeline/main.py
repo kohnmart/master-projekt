@@ -15,6 +15,8 @@ db = client.detex_ai
 # Access a collection
 collection = db.boundingboxes
 
+collection.delete_many({})
+
 print ('Connected succesfully to database...')
 
 print('Launching...')
@@ -28,7 +30,7 @@ print('Instance are setup...')
 start_time = time.time()
 
 file_names = []
-indexes = [f'{i:04}' for i in range(17,22)]  # Generate index strings from '0000' to '0020'
+indexes = [f'{i:04}' for i in range(17,21)]  # Generate index strings from '0000' to '0020'
 for index in indexes:
     file_names.append(f"mixed_{index}.png")
 
@@ -42,17 +44,19 @@ for sample in file_names:
 
     cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, image, True, True)
     
+    print(len(cloth_objects))
+    print(len(cleaned_compared_masks))
 
-    probs = []
-    
+    probs_strings = []
+    labels = []
     for cloth in cloth_objects:
         clip_instance.image = cloth
 
         res = clip_instance.classifier()
-        probs.append(res)
-        print(res)
+        labels.append(res[0])
+        probs_strings.append(f'{res[0]}: {res[1]}')
 
-    for mask in cleaned_masks:
+    for i, mask in enumerate(cleaned_compared_masks):
         result = collection.insert_one({
             '_id': str(uuid.uuid4()),
             'sample_id': sample,
@@ -61,17 +65,14 @@ for sample in file_names:
             'top': mask['bbox'][1],
             'width': mask['bbox'][2],
             'height': mask['bbox'][3],
-            'label': res,
+            'label': labels[i],
             'iou_score': mask['predicted_iou'],
         })
 
-        if result.acknowledged:
-            print("Insertion successful")
-            print("Inserted document ID:", result.inserted_id)
-        else:
+        if not result.acknowledged:
             print("Insertion failed")
 
-    sam_instance.save_sample_with_bboxes(cleaned_compared_masks, image, sample, probs)
+    # sam_instance.save_sample_with_bboxes(cleaned_compared_masks, image, sample, probs)
 
 
 end_time = time.time()

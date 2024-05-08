@@ -9,7 +9,7 @@ const boundingSchema = new mongoose.Schema(
     top: { type: Number, required: true },
     width: { type: Number, required: true },
     height: { type: Number, required: true },
-    label: { type: String, required: true },
+    label: { type: Array, required: true },
     iou_score: { type: Number, required: false },
   },
   { timestamps: true }

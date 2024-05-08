@@ -49,7 +49,7 @@ async function loadBoundingBoxes(sample_id) {
         fill: 'transparent',
         stroke: 'red',
         strokeWidth: 2,
-        label: bbox.label,
+        label: bbox.label[0],
         iou_score: bbox.iou_score,
       });
       canvas.add(rect);

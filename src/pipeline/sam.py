@@ -82,6 +82,7 @@ class SAM:
             cropped_image_bgr = cv2.cvtColor(cropped_image, cv2.COLOR_RGB2BGR)
 
             mean = np.mean(cropped_image[0])
+            print(mean)
             if mean < 230:
 
                 separated_images.append(cropped_image_bgr)
