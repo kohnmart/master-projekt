@@ -46,8 +46,8 @@ class SAM:
         result = cv2.cvtColor(ycrcb_eq, cv2.COLOR_YCrCb2RGB)
         return result
 
-    def image_processor(self, file_name):
-        img_path = get_training_data_path(DATASET_PATH_TYPE.segmentator, file_name)
+    def image_processor(self, img_path):
+        #img_path = get_training_data_path(DATASET_PATH_TYPE.generator, file_name)
         image_bgr = cv2.imread(img_path)
         image_ycrcb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2YCrCb)
         blurred_image = cv2.medianBlur(image_ycrcb, 21)
