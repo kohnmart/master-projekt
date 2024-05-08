@@ -20,8 +20,8 @@ router.put('/canvas', async (req, res) => {
 router.delete('/canvas/:id', async (req, res) => {
   try {
     // Iterate over each bounding box
-    const sample_id = req.params.id;
-    await BoundingBox.deleteAll(sample_id);
+    const _id = req.params.id;
+    await BoundingBox.deleteSingle(_id);
 
     // Respond with success message
     res.status(200).json({ message: 'All Bboxes deleted' });

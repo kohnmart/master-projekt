@@ -17,20 +17,18 @@ class ClipClassifier:
     def classifier(self):
         
         probs = self.predictor(['a photo a upper body cloth', 'a photo of a lower body cloth'])
-
-        if probs[0][0] < probs[0][1]:
+        if probs[0][0].item() < probs[0][1].item():
             probs = self.predictor(['a photo of a short pants', 'a photo of a long pants'])
-            res = f'Short: {probs[0][0]:.2f}' if probs[0][0] > probs[0][1] else f'pant: {probs[0][1]:.2f}'
+            res = ('Short', probs[0][0].item()) if probs[0][0] > probs[0][1] else ('Pant', probs[0][1].item())
 
         else: 
             probs = self.predictor(['a photo of a short-sleeve top', 'a photo of a long-sleeve top'])
-
-            if probs[0][0] > probs[0][1]:
+            if probs[0][0].item() > probs[0][1].item():
                 probs = self.predictor(['a photo of a t-shirt', 'a photo of a polo-shirt'])
-                res = f'Tshirt: {probs[0][0]:.2f}' if probs[0][0] > probs[0][1] else f'Polo: {probs[0][1]:.2f}'
+                res = ('T-Shirt', probs[0][0].item()) if probs[0][0] > probs[0][1] else ('Polo', probs[0][1].item())
 
             else:
                 probs = self.predictor(['a photo of a sweatshirt', 'a photo of a jacket'])
-                res = f'Shirt: {probs[0][0]:.2f}' if probs[0][0] > probs[0][1] else f'Jacket: {probs[0][1]:.2f}'
+                res = ('Shirt', probs[0][0].item()) if probs[0][0] > probs[0][1] else ('Jacket', probs[0][1].item())
 
         return res

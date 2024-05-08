@@ -31,8 +31,9 @@ function clearCanvas() {
 }
 
 function deleteFromCanvas() {
-  deleteBboxes(state.images[state.currentIndex]);
-  clearCanvas();
+  const rect = canvas.getActiveObject();
+  deleteBboxes(rect.id);
+  canvas.remove(rect);
 }
 
 async function loadBoundingBoxes(sample_id) {

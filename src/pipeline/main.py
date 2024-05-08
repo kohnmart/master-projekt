@@ -50,7 +50,7 @@ for sample in file_names:
 
         res = clip_instance.classifier()
         probs.append(res)
-
+        print(res)
 
     for mask in cleaned_masks:
         result = collection.insert_one({

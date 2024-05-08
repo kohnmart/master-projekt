@@ -24,7 +24,7 @@ const Model = mongoose.model('BoundingBox', boundingSchema);
 const post = async (bboxes) => {
   try {
     await mongoose.connect(URI, {
-      dbName: 'detex-ai',
+      dbName: 'detex_ai',
     });
     console.log(bboxes);
     console.log('Connected to MongoDB');
@@ -53,7 +53,7 @@ const post = async (bboxes) => {
 const deleteAll = async (sample_id) => {
   try {
     await mongoose.connect(URI, {
-      dbName: 'detex-ai',
+      dbName: 'detex_ai',
     });
 
     const res = await Model.deleteMany({ sample_id: sample_id });
@@ -65,10 +65,25 @@ const deleteAll = async (sample_id) => {
   }
 };
 
+const deleteSingle = async (_id) => {
+  try {
+    await mongoose.connect(URI, {
+      dbName: 'detex_ai',
+    });
+
+    const res = await Model.deleteMany({ _id: _id });
+    console.log(res.deletedCount, 'documents deleted');
+  } catch (err) {
+    console.log('Error on Delete', err);
+  } finally {
+    await mongoose.connection.close();
+  }
+};
+
 const getAll = async (sample_id) => {
   try {
     await mongoose.connect(URI, {
-      dbName: 'detex-ai',
+      dbName: 'detex_ai',
     });
 
     const res = await Model.find({ sample_id: sample_id });
@@ -83,7 +98,7 @@ const getAll = async (sample_id) => {
 const getAllEntries = async () => {
   try {
     await mongoose.connect(URI, {
-      dbName: 'detex-ai',
+      dbName: 'detex_ai',
     });
 
     const res = await Model.find().toArray();
@@ -95,4 +110,11 @@ const getAllEntries = async () => {
   }
 };
 
-module.exports = { Model, post, getAll, getAllEntries, deleteAll };
+module.exports = {
+  Model,
+  post,
+  getAll,
+  getAllEntries,
+  deleteAll,
+  deleteSingle,
+};
