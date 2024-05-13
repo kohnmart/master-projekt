@@ -4,7 +4,10 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/images', (req, res) => {
-  const imagesDir = path.join(__dirname, '../../dataset/generator/output/');
+  const imagesDir = path.join(
+    __dirname,
+    '../../dataset/classifier/train/dress/'
+  );
   try {
     // Read the contents of the directory
     const images = fs.readdirSync(imagesDir);

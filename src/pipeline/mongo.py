@@ -7,7 +7,8 @@ class MONGO:
 
     def __init__(self):
         load_dotenv()
-        mongo_key = os.environ.get('MONGO_KEY')
+        print(os.environ.get('MONGO_KEY'))
+        mongo_key = 'mongodb+srv://mkohnle:Gni1Km1F0nWFXoNw@cluster0.t1akszl.mongodb.net/?retryWrites=true&w=majority'
         self.client = pymongo.MongoClient(mongo_key)
         self.db = self.client.detex_ai
         self.collection = self.db.boundingboxes

@@ -2,8 +2,8 @@ import { fetchBboxes, deleteBboxes } from './fetch.js';
 import { state } from './image.js';
 const canvas = new fabric.Canvas('c', {
   isDrawingMode: false,
-  width: 500,
-  height: 500,
+  width: 250,
+  height: 250,
 });
 
 function enableRectangleDrawing() {

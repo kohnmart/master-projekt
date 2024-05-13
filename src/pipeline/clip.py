@@ -14,21 +14,28 @@ class ClipClassifier:
         logits_per_image = outputs.logits_per_image 
         return logits_per_image.softmax(dim=1) 
    
+    def get_label(self, probs, classes):
+        res_list = []
+        for i, prob in enumerate(probs[0]):
+            res_list.append([classes[i], prob.item()])
+        res_list.sort(key=lambda x: x[1], reverse=True)
+        print("RES: " + str(res_list[0]))
+        return res_list[0]
+
     def classifier(self):
         
-        probs = self.predictor(['a photo a upper body cloth', 'a photo of a lower body cloth'])
+        probs = self.predictor(['a photo a upper body cloth type', 'a photo of a lower body cloth type'])
         if probs[0][0].item() < probs[0][1].item():
-            probs = self.predictor(['a photo of a short pants', 'a photo of a long pants'])
-            res = ('Short', probs[0][0].item()) if probs[0][0] > probs[0][1] else ('Pant', probs[0][1].item())
+            probs = self.predictor(['a photo of a short pants', 'a photo of a long pants', 'a photo of a skirt'])
+            res = self.get_label(probs, ['short', 'pant', 'skirt'])
 
         else: 
             probs = self.predictor(['a photo of a short-sleeve top', 'a photo of a long-sleeve top'])
             if probs[0][0].item() > probs[0][1].item():
-                probs = self.predictor(['a photo of a t-shirt', 'a photo of a polo-shirt'])
-                res = ('T-Shirt', probs[0][0].item()) if probs[0][0] > probs[0][1] else ('Polo', probs[0][1].item())
+                probs = self.predictor(['a photo of a t-shirt', 'a photo of a polo-shirt', 'a photo of a dress'])
+                res = self.get_label(probs, ['t-shirt', 'polo', 'dress'])
 
             else:
                 probs = self.predictor(['a photo of a sweatshirt', 'a photo of a jacket'])
-                res = ('Shirt', probs[0][0].item()) if probs[0][0] > probs[0][1] else ('Jacket', probs[0][1].item())
-
+                res = self.get_label(probs, ['shirt', 'jacket'])
         return res

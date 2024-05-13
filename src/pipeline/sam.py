@@ -24,8 +24,8 @@ class SAM:
         self.mask_generator = SamAutomaticMaskGenerator(
         model=sam,
         points_per_side=5,
-        pred_iou_thresh=0.96,
-        stability_score_thresh=0.96,
+        pred_iou_thresh=0.98,
+        stability_score_thresh=0.98,
         crop_n_layers=1,
         crop_n_points_downscale_factor=2,
         min_mask_region_area=100,  # Requires open-cv to run post-processing
@@ -50,7 +50,7 @@ class SAM:
         #img_path = get_training_data_path(DATASET_PATH_TYPE.generator, file_name)
         image_bgr = cv2.imread(img_path)
         image_ycrcb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2YCrCb)
-        blurred_image = cv2.medianBlur(image_ycrcb, 21)
+        blurred_image = cv2.medianBlur(image_ycrcb, 25)
         processed_image = self.remove_shadow_rgb(blurred_image) 
 
         return self.mask_generator.generate(processed_image), image_bgr

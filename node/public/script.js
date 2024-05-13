@@ -44,15 +44,14 @@ const clothButtons = [];
 let btnBefore = null;
 function addClothTypes() {
   const clothes = [
-    'Jacket',
-    'Shirt',
-    'T-Shirt',
-    'Polo',
-    'Dress',
-    'Pant',
-    'Short',
-    'Skirt',
-    'Unkown',
+    'jacket',
+    'shirt',
+    't-shirt',
+    'polo',
+    'dress',
+    'pant',
+    'short',
+    'skirt',
   ];
   const actions = document.getElementById('actions');
   const div = document.createElement('div');
