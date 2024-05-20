@@ -27,9 +27,15 @@ def erase_pixels(image, x, y, width, height, noise_factor):
 
     return image
 
-def erase_generator(path):
+def erase_generator(path=None, image=None):
     # Example usage
-    image = Image.open(path)  # Load your image here
+    image = None
+    if path:
+        image = Image.open(path)  # Load your image here
+
+    else: 
+        image = image
+    
     sub_area = image.width * image.height
     sub_area = sub_area * 0.2  # Calculate the original image area
 
