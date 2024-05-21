@@ -25,16 +25,17 @@ def getAttMap(img, attn_map, blur=True):
             (attn_map**0.7).reshape(attn_map.shape+(1,)) * attn_map_c
     return attn_map
 
-def viz_attn(img, attn_map, blur=True):
+def viz_attn(img, attn_map, title, title_color, blur=True):
     _, axes = plt.subplots(1, 2, figsize=(10, 5))
+    axes[0].set_title(title, color=title_color)
     axes[0].imshow(img)
-    axes[1].imshow(getAttMap(img, attn_map, blur))
+    if attn_map:
+        axes[1].imshow(getAttMap(img, attn_map, blur))
     for ax in axes:
         ax.axis("off")
     plt.show()
 
-def load_image(img_path, resize=None):
-    image = Image.open(img_path).convert("RGB")
+def load_image(image, resize=None):
     if resize is not None:
         image = image.resize((resize, resize))
     return np.asarray(image).astype(np.float32) / 255.

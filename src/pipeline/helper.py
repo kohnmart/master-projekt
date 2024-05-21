@@ -1,14 +1,14 @@
 import os
 
 
-def get_all_samples():
+def get_all_samples(cloth_type):
     
     file_names = []
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
 
-    relative_path = 'dataset/classifier/train/dress'
+    relative_path = f'dataset/classifier/train/{cloth_type}'
 
     folder_path = os.path.join(project_root, relative_path)
 
