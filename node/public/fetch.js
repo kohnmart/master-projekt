@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 const fetchImages = async () => {
   try {
     const response = await axios.get('/images');
@@ -42,4 +44,22 @@ const deleteBboxes = async (id) => {
   }
 };
 
-export { fetchImages, fetchBboxes, deleteBboxes, fetchAllBboxes };
+const getFolderStructure = async () => {
+  try {
+    console.log('test');
+    const url = '/struct/folder-structure';
+    const response = await axios.get(url);
+    console.log(response);
+  } catch (error) {
+    console.error('Error fetching images:', error);
+    alert('Error fetching images. Please try again.');
+  }
+};
+
+export {
+  fetchImages,
+  fetchBboxes,
+  deleteBboxes,
+  fetchAllBboxes,
+  getFolderStructure,
+};

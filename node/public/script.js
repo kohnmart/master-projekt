@@ -14,6 +14,8 @@ import {
   saveBoundingBoxes,
 } from './canvas.js';
 
+import getFolderStructure from './fetch.js';
+
 const sampleLengthTotalElement = document.createElement('p');
 sampleLengthTotalElement.id = 'counter';
 const clear = document.getElementById('clearCanvas');
@@ -26,6 +28,7 @@ document
 document.addEventListener('DOMContentLoaded', async () => {
   setupKeyboardNavigation();
   addClothTypes();
+  getFolderStructure();
   await loadImages();
   sampleLengthTotalElement.textContent = `0 / ${state.images.length}`;
   actions.appendChild(sampleLengthTotalElement);

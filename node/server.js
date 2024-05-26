@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const imageRoutes = require('./route/image');
 const canvasRoutes = require('./route/canvas');
+const structRoutes = require('./route/structure');
 const app = express();
 
 app.use(express.json());
@@ -13,6 +14,7 @@ app.use(
   express.static(path.join(__dirname, '../dataset/classifier/train/dress/'))
 );
 
+app.use(structRoutes);
 app.use(imageRoutes);
 app.use(canvasRoutes);
 
