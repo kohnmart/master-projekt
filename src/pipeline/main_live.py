@@ -11,7 +11,7 @@ print('Launching...')
 
 sam_instance = SAM()
 clip_instance = ClipClassifier()
-yolo_instance = YOLOS(700)
+yolo_instance = YOLOS(stream_width=700)
 # Path to the video file
 video_path = './stream_video/1.mp4'
 
@@ -40,8 +40,6 @@ while cap.isOpened():
     if frame_count % frames_to_skip == 0:
         # Save or process the frame
         # Pipeline Entry for Cloth Detection and Classification
-        print(f"Processing frame {frame_count}")
-
         state = yolo_instance.process(frame)
 
         if state:
@@ -50,12 +48,15 @@ while cap.isOpened():
 
             cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, frame, True, False)
             
+            #labels = []
+            #probs_strings = []
             for i, cloth in enumerate(cloth_objects):
-                cv2.imwrite(f"output/frame_{frame_count}_{i}.jpg", cloth)
+                clip_instance.image = cloth
+                res = clip_instance.classifier()
+                #labels.append(res[0])
+                #probs_strings.append(f'{res[0]}: {res[1]}')
+                cv2.imwrite(f"output/frame_{frame_count}__{res[0]}_{i}.jpg", cloth)
 
-        else:
-            print("No object in center place")
-    
     frame_count += 1
 
 # Release the video capture object

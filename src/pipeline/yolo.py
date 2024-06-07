@@ -39,7 +39,6 @@ class YOLOS:
             box_height = y_max - y_min
 
             m_x = (x_min + box_width) / 2
-            print(x_min)
             # Object in Camera Center
             if x_min >= 90 and x_min <= 100:
                 print(
