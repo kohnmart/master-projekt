@@ -20,7 +20,7 @@ cap = cv2.VideoCapture(video_path)
 
 # Frame rate of the video
 frame_rate = cap.get(cv2.CAP_PROP_FPS)
-print(frame_rate)
+
 # Distance an object moves per frame (in meters)
 distance_per_frame = 1 / frame_rate # 1 meter per second speed, captured each second
 
@@ -38,24 +38,19 @@ while cap.isOpened():
         break
     
     if frame_count % frames_to_skip == 0:
-        # Save or process the frame
-        # Pipeline Entry for Cloth Detection and Classification
-        state = yolo_instance.process(frame)
 
-        if state:
+        cloth_detected_state = yolo_instance.process(frame)
+
+        if cloth_detected_state:
             masks = sam_instance.image_processor(frame=frame)
             cleaned_masks = sam_instance.clean_masks(masks, range=[60000, 160000])
 
             cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, frame, True, False)
             
-            #labels = []
-            #probs_strings = []
             for i, cloth in enumerate(cloth_objects):
                 clip_instance.image = cloth
                 res = clip_instance.classifier()
-                #labels.append(res[0])
-                #probs_strings.append(f'{res[0]}: {res[1]}')
-                cv2.imwrite(f"output/frame_{frame_count}__{res[0]}_{i}.jpg", cloth)
+                cv2.imwrite(f"output/v5/frame_{frame_count}__{res[0]}_{i}.jpg", cloth)
 
     frame_count += 1
 
