@@ -75,6 +75,16 @@ class SAM:
 
         separated_images = []
         masks_cleaned_compared = []
+
+        max_area = 0
+
+        for ann in enumerate(masks_cleaned):
+            area = ann[1]['area']
+            if max_area < area:
+                max_area = area
+                print(max_area)
+
+
         for i, ann in enumerate(masks_cleaned):
         # Extract bounding box coordinates
             x, y, width, height = map(int, ann['bbox'])  # Ensure integer values
@@ -89,8 +99,7 @@ class SAM:
             cropped_image_bgr = cv2.cvtColor(cropped_image, cv2.COLOR_RGB2BGR)
 
             mean = np.mean(cropped_image[0])
-            print(mean)
-            if mean < 230:
+            if max_area == ann['area']:
 
                 separated_images.append(cropped_image_bgr)
                 masks_cleaned_compared.append((masks_cleaned[i]))
