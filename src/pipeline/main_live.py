@@ -13,7 +13,7 @@ sam_instance = SAM()
 clip_instance = ClipClassifier()
 yolo_instance = YOLOS(stream_width=700)
 # Path to the video file
-video_path = './stream_video/1.mp4'
+video_path = './stream_video/2.mp4'
 
 # Initialize a video capture object
 cap = cv2.VideoCapture(video_path)
@@ -38,19 +38,18 @@ while cap.isOpened():
         break
     
     if frame_count % frames_to_skip == 0:
+        is_detected_state, cropped_image = yolo_instance.process(frame)
+        if is_detected_state:
+            #cv2.imwrite(f"output/v7/frame_{frame_count}test.jpg", cropped_image)
+            masks = sam_instance.image_processor(frame=cropped_image)
+            cleaned_masks = sam_instance.clean_masks(masks, range=[30000, 160000])
 
-        cloth_detected_state = yolo_instance.process(frame)
-
-        if cloth_detected_state:
-            masks = sam_instance.image_processor(frame=frame)
-            cleaned_masks = sam_instance.clean_masks(masks, range=[60000, 160000])
-
-            cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, frame, True, False)
+            cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, cropped_image, True, False)
             
             for i, cloth in enumerate(cloth_objects):
                 clip_instance.image = cloth
                 res = clip_instance.classifier()
-                cv2.imwrite(f"output/v5/frame_{frame_count}__{res[0]}_{i}.jpg", cloth)
+                cv2.imwrite(f"output/v8/frame_{frame_count}__{res[0]}_{i}.jpg", cloth)
 
     frame_count += 1
 
