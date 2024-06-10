@@ -82,9 +82,7 @@ class SAM:
             area = ann[1]['area']
             if max_area < area:
                 max_area = area
-                print(max_area)
-
-
+                
         for i, ann in enumerate(masks_cleaned):
         # Extract bounding box coordinates
             x, y, width, height = map(int, ann['bbox'])  # Ensure integer values

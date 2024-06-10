@@ -33,10 +33,8 @@ class YOLOS:
             box_width = x_max - x_min
             box_height = y_max - y_min
 
-            # Calculate the midpoint of the box
-            m_x = (x_min + x_max) / 2
             # Object in Camera Center
-            if 90 <= x_min <= 100:
+            if 5 <= y_min <= 50:
                 print(
                     f"Detected Cloth Object with confidence "
                     f"{round(score.item(), 3)} at location {box}"

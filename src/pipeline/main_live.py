@@ -1,11 +1,28 @@
 import cv2
 import time
 from sam import SAM
-from helper import get_all_samples
 from mongo import MONGO
-from clip import ClipClassifier
 from yolo import YOLOS
+from helper import get_all_samples
+from clip import ClipClassifier
 import numpy as np
+from keying import keying
+
+
+def rotate_image(image, angle):
+    # Get the dimensions of the image
+    (height, width) = image.shape[:2]
+    
+    # Calculate the center of the image
+    center = (width // 2, height // 2)
+    
+    # Get the rotation matrix
+    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+    
+    # Perform the rotation
+    rotated_image = cv2.warpAffine(image, rotation_matrix, (width, height))
+    
+    return rotated_image
 
 print('Launching...')
 
@@ -31,27 +48,41 @@ capture_interval = 0.05  # meters
 frames_to_skip = int(capture_interval / distance_per_frame)
 
 frame_count = 0
-
+wait_count = 0
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
     
-    if frame_count % frames_to_skip == 0:
+    if wait_count == 0:
+        frame = rotate_image(frame, -90)
         is_detected_state, cropped_image = yolo_instance.process(frame)
+        #cv2.imwrite(f"output/v10/frame_{frame_count}_.jpg", frame)
         if is_detected_state:
+            keyed_frame = keying(cropped_image)
+            wait_count = 1
             #cv2.imwrite(f"output/v7/frame_{frame_count}test.jpg", cropped_image)
-            masks = sam_instance.image_processor(frame=cropped_image)
-            cleaned_masks = sam_instance.clean_masks(masks, range=[30000, 160000])
+            #masks = sam_instance.image_processor(frame=cropped_image)
+            #cleaned_masks = sam_instance.clean_masks(masks, range=[30000, 160000])
 
-            cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, cropped_image, True, False)
+            clip_instance.image = keyed_frame
+            res = clip_instance.classifier()
+            cv2.imwrite(f"output/v10/frame_{frame_count}_{res[0]}_.jpg", keyed_frame)
+
+
+            #cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, cropped_image, True, False)
             
-            for i, cloth in enumerate(cloth_objects):
-                clip_instance.image = cloth
-                res = clip_instance.classifier()
-                cv2.imwrite(f"output/v8/frame_{frame_count}__{res[0]}_{i}.jpg", cloth)
+            # for i, cloth in enumerate(cloth_objects):
+            #     clip_instance.image = cloth
+            #     res = clip_instance.classifier()
+            #     cv2.imwrite(f"output/v8/frame_{frame_count}__{res[0]}_{i}.jpg", cloth)
+
+    else:
+        wait_count -= 1
 
     frame_count += 1
 
 # Release the video capture object
 cap.release()
+
+
