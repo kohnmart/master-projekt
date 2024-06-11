@@ -34,7 +34,7 @@ class YOLOS:
             box_height = y_max - y_min
 
             # Object in Camera Center
-            if 5 <= y_min <= 50:
+            if 5 <= y_min <= 100:
                 print(
                     f"Detected Cloth Object with confidence "
                     f"{round(score.item(), 3)} at location {box}"

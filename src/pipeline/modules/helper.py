@@ -1,5 +1,5 @@
 import os
-
+import cv2
 
 def get_all_samples(cloth_type):
     
@@ -21,4 +21,25 @@ def get_all_samples(cloth_type):
     
     return file_names
 
+
+def rotate_image(image, angle):
+    # Get the dimensions of the image
+    (height, width) = image.shape[:2]
+    
+    # Calculate the center of the image
+    center = (width // 2, height // 2)
+    
+    # Get the rotation matrix
+    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+    
+    # Perform the rotation
+    rotated_image = cv2.warpAffine(image, rotation_matrix, (width, height))
+    
+    return rotated_image
+
+
+
+def mask_area(image):
+    (height, width) = image.shape[:2]
+    return height * width
 

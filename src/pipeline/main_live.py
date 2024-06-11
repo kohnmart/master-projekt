@@ -1,28 +1,13 @@
 import cv2
 import time
-from sam import SAM
-from mongo import MONGO
-from yolo import YOLOS
-from helper import get_all_samples
-from clip import ClipClassifier
 import numpy as np
-from keying import keying
+from modules.sam import SAM
+from modules.mongo import MONGO
+from modules.yolo import YOLOS
+from modules.helper import rotate_image, mask_area
+from modules.clip import ClipClassifier
+from modules.keying import keying
 
-
-def rotate_image(image, angle):
-    # Get the dimensions of the image
-    (height, width) = image.shape[:2]
-    
-    # Calculate the center of the image
-    center = (width // 2, height // 2)
-    
-    # Get the rotation matrix
-    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-    
-    # Perform the rotation
-    rotated_image = cv2.warpAffine(image, rotation_matrix, (width, height))
-    
-    return rotated_image
 
 print('Launching...')
 
@@ -31,6 +16,8 @@ clip_instance = ClipClassifier()
 yolo_instance = YOLOS(stream_width=700)
 # Path to the video file
 video_path = './stream_video/2.mp4'
+
+print('Running...')
 
 # Initialize a video capture object
 cap = cv2.VideoCapture(video_path)
@@ -58,7 +45,9 @@ while cap.isOpened():
         frame = rotate_image(frame, -90)
         is_detected_state, cropped_image = yolo_instance.process(frame)
         #cv2.imwrite(f"output/v10/frame_{frame_count}_.jpg", frame)
-        if is_detected_state:
+        area = mask_area(cropped_image)
+
+        if is_detected_state and area >= 65000:
             keyed_frame = keying(cropped_image)
             wait_count = 1
             #cv2.imwrite(f"output/v7/frame_{frame_count}test.jpg", cropped_image)
