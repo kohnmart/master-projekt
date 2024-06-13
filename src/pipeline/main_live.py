@@ -1,37 +1,27 @@
 import cv2
-import time
-import numpy as np
-from modules.sam import SAM
-from modules.mongo import MONGO
 from modules.yolo import YOLOS
-from modules.helper import rotate_image, mask_area
-from modules.clip import ClipClassifier
+from modules.helper import rotate_image
+from modules.clip import ClipClassifier, ClipClassifierUpdate
 from modules.keying import keying
 
 
 print('Launching...')
 
-sam_instance = SAM()
-clip_instance = ClipClassifier()
-yolo_instance = YOLOS(stream_width=700)
+clip_instance = ClipClassifierUpdate()
+yolo_instance = YOLOS()
 # Path to the video file
-video_path = './stream_video/2.mp4'
+
+video_path = './stream_video/' + '3.mp4'
 
 print('Running...')
 
 # Initialize a video capture object
 cap = cv2.VideoCapture(video_path)
+cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-# Frame rate of the video
 frame_rate = cap.get(cv2.CAP_PROP_FPS)
-
-# Distance an object moves per frame (in meters)
 distance_per_frame = 1 / frame_rate # 1 meter per second speed, captured each second
-
-# Decide on the physical distance over which you want to capture frames (e.g., every 10 cm)
 capture_interval = 0.05  # meters
-
-# Calculate the number of frames to skip to capture the desired spatial interval
 frames_to_skip = int(capture_interval / distance_per_frame)
 
 frame_count = 0
@@ -41,37 +31,20 @@ while cap.isOpened():
     if not ret:
         break
     
-    if wait_count == 0:
-        frame = rotate_image(frame, -90)
-        is_detected_state, cropped_image = yolo_instance.process(frame)
-        #cv2.imwrite(f"output/v10/frame_{frame_count}_.jpg", frame)
-        area = mask_area(cropped_image)
+    #print(frame_count)
+    #frame = rotate_image(frame, -90)
+    is_detected_state, cropped_image = yolo_instance.process(frame)
 
-        if is_detected_state and area >= 65000:
-            keyed_frame = keying(cropped_image)
-            wait_count = 1
-            #cv2.imwrite(f"output/v7/frame_{frame_count}test.jpg", cropped_image)
-            #masks = sam_instance.image_processor(frame=cropped_image)
-            #cleaned_masks = sam_instance.clean_masks(masks, range=[30000, 160000])
-
-            clip_instance.image = keyed_frame
-            res = clip_instance.classifier()
-            cv2.imwrite(f"output/v10/frame_{frame_count}_{res[0]}_.jpg", keyed_frame)
-
-
-            #cloth_objects, cleaned_compared_masks = sam_instance.separate_by_bbox(cleaned_masks, cropped_image, True, False)
-            
-            # for i, cloth in enumerate(cloth_objects):
-            #     clip_instance.image = cloth
-            #     res = clip_instance.classifier()
-            #     cv2.imwrite(f"output/v8/frame_{frame_count}__{res[0]}_{i}.jpg", cloth)
-
-    else:
-        wait_count -= 1
+    if is_detected_state:
+        keyed_frame = keying(cropped_image)
+        clip_instance.image = keyed_frame
+        res = clip_instance.process(keyed_frame)
+        cv2.imwrite(f"output/v15/frame_{frame_count}_{res[0]}__.jpg", keyed_frame)
 
     frame_count += 1
 
 # Release the video capture object
 cap.release()
 
+print('Finished...')
 

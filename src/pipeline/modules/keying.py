@@ -6,16 +6,17 @@ def keying(orig_image):
     n_image = orig_image.copy()
     n_image = cv2.medianBlur(n_image, 31)
 
-    n_cropped = n_image[0:5, 10:15]
-    average_color = n_cropped.mean(axis=0).mean(axis=0)
+    # n_cropped = n_image[0:5, 10:15]
+    # average_color = n_cropped.mean(axis=0).mean(axis=0)
+    # print(average_color)
+
+    average_color = np.array([104.12, 171.12, 13.32])
 
     # Define a threshold range around the average color
     threshold = 60  # Adjust this value as needed
     lower_bound = np.clip(average_color - threshold, 0, 255)
     upper_bound = np.clip(average_color + threshold, 0, 255)
 
-    # Apply the threshold to create a mask
-    # Apply the threshold to create a mask
     mask = cv2.inRange(n_image, lower_bound, upper_bound)
 
     # Invert the mask to create a binary mask
@@ -23,6 +24,5 @@ def keying(orig_image):
 
 
     result_image = cv2.bitwise_and(orig_image, orig_image, mask=binary_mask)
-
 
     return result_image

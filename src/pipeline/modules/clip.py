@@ -1,6 +1,8 @@
 
 from transformers import CLIPProcessor, CLIPModel
-
+import torch
+import clip
+from PIL import Image
 class ClipClassifier: 
 
     def __init__(self):
@@ -39,3 +41,50 @@ class ClipClassifier:
                 probs = self.predictor(['a photo of a sweatshirt', 'a photo of a jacket'])
                 res = self.get_label(probs, ['shirt', 'jacket'])
         return res
+
+
+
+# Reference : https://github.com/openai/CLIP
+class ClipClassifierUpdate: 
+
+    def __init__(self):
+        clip_model = "ViT-B/16" #@param ["RN50", "RN101", "RN50x4", "RN50x16", "ViT-B/14", "ViT-B/16", "ViT-B/32"]
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model, self.preprocess = clip.load(clip_model, device=self.device, jit=False)
+        self.classes =  ['dress', 'skirt', 'jacket', 'shirt', 'tshirt', 'pant', 'short']
+        self.classes_prompt = [f'a photo of a {cl}' for cl in self.classes]
+
+    def process(self, image):
+        
+        image = Image.fromarray(image)
+
+        image_input = self.preprocess(image).unsqueeze(0).to(self.device)
+        text = clip.tokenize(self.classes_prompt).to(self.device)
+
+        with torch.no_grad():
+            image_features = self.model.encode_image(image_input)
+            text_features = self.model.encode_text(text)
+
+        
+        # Pick the top 5 most similar labels for the image
+        image_features /= image_features.norm(dim=-1, keepdim=True)
+        text_features /= text_features.norm(dim=-1, keepdim=True)
+        similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
+        values, indices = similarity[0].topk(3)
+
+
+        # Print the result
+        #print("\nTop predictions:\n")
+        highest_value = -1
+        highest_pair = None
+
+        for value, index in zip(values, indices):
+            #print(f"{self.classes[index]:>16s}: {100 * value.item():.2f}%")
+            if value.item() > highest_value:
+                highest_value = value.item()
+                highest_pair = (self.classes[index], 100 * value.item())
+
+        # Return the highest value pair
+        return highest_pair
+
+                
