@@ -45,10 +45,16 @@ class ClipClassifier:
 
 
 # Reference : https://github.com/openai/CLIP
-class ClipClassifierUpdate: 
 
-    def __init__(self):
-        clip_model = "ViT-B/16" #@param ["RN50", "RN101", "RN50x4", "RN50x16", "ViT-B/14", "ViT-B/16", "ViT-B/32"]
+class ClipFast: 
+
+    """
+    model_name: ["RN50", "RN101", "RN50x4", "RN50x16", "ViT-B/14", "ViT-B/16", "ViT-B/32"]
+
+    """
+
+    def __init__(self, model_name):
+        clip_model = model_name 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model, self.preprocess = clip.load(clip_model, device=self.device, jit=False)
         self.classes =  ['dress', 'skirt', 'jacket', 'shirt', 'tshirt', 'pant', 'short']
@@ -77,12 +83,47 @@ class ClipClassifierUpdate:
         #print("\nTop predictions:\n")
         highest_value = -1
         highest_pair = None
+        highest_index = -1
 
-        for value, index in zip(values, indices):
-            #print(f"{self.classes[index]:>16s}: {100 * value.item():.2f}%")
-            if value.item() > highest_value:
-                highest_value = value.item()
-                highest_pair = (self.classes[index], 100 * value.item())
+        paired_listing = []
+
+        # Combine values and indices
+        paired = list(zip(values, indices))
+
+        # Sort pairs by the first element (value)
+        sorted_paired = sorted(paired, key=lambda x: x[0], reverse=True)
+
+        # Iterate through the sorted pairs
+        for value, index in sorted_paired:
+            print(f"Value: {value}, Index: {self.classes[index]}")
+            paired_listing.append([self.classes[index], value.item()])
+
+        # for value, index in zip(values, indices):
+        #     print(f"{self.classes[index]:>16s}: {100 * value.item():.2f}%")
+        #     if value.item() > highest_value:
+        #         highest_value = value.item()
+        #         highest_pair = (self.classes[index], 100 * value.item())
+        #         highest_index = index
+                
+        highest_pair = paired_listing[0]
+
+        print("Highest Pair")
+        print(highest_pair)
+
+        if paired_listing[0][0] == 'shirt' and paired_listing[1][0] == 'tshirt':
+            w, h = image.size
+            ratio = w / h
+            print(ratio)
+            if ratio <= 1.3:
+                highest_pair = paired_listing[1]
+
+
+        if paired_listing[0][0] == 'pant':
+            w, h = image.size
+            ratio = w / h
+            print(ratio)
+            if ratio <= 1.3:
+                highest_pair = paired_listing[2]
 
         # Return the highest value pair
         return highest_pair

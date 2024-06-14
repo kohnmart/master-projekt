@@ -10,14 +10,17 @@ class YOLOS:
 
     def process(self, image):
 
+        found_objects = []
         detected = False
         cropped_image = []
 
-        found_objects = []
         scores = []
         index = -1
+
         inputs = self.image_processor(images=image, return_tensors="pt")
         outputs = self.model(**inputs)
+        logits = outputs.logits
+        bboxes = outputs.pred_boxes
 
         image_np = np.array(image)  # Convert the image to a NumPy array once
         height, width, _ = image_np.shape
@@ -34,21 +37,15 @@ class YOLOS:
             x_max = min(width, x_max)
             y_max = min(height, y_max)
 
-
             cropped_image = image_np[y_min:y_max, x_min:x_max]
-     
             x, y = cropped_image.shape[:2]
-            if 100 <= x_min <= 130:
-                if (x * y >= 60000):
-                    print(f"Detected object with size {x * y} and score: {score.item()}")
-                    # Display the cropped image
-                    detected = True
-                    found_objects.append(cropped_image)
-                    scores.append(score.item())
-                else: 
-                    detected = False
-                    cropped_image = []
-        
+            if 50 <= x_min <= 100 and (x * y >= 60000):
+                # Display the cropped image
+                detected = True
+                found_objects.append(cropped_image)
+                scores.append(score.item())
+
+
         temp_score = 0
         for i, score in enumerate(scores):
             if score > temp_score:
@@ -57,7 +54,5 @@ class YOLOS:
 
         if index != -1:
             found_objects = found_objects[index]
-        
-
 
         return detected, found_objects
