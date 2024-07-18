@@ -39,7 +39,7 @@ class YOLOS:
 
             cropped_image = image_np[y_min:y_max, x_min:x_max]
             x, y = cropped_image.shape[:2]
-            if 50 <= x_min <= 100 and (x * y >= 60000):
+            if 50 <= x_min <= 300 and (x * y >= 60000):
                 # Display the cropped image
                 detected = True
                 found_objects.append(cropped_image)

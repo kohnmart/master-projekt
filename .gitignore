@@ -5,3 +5,4 @@ src/pipeline/model_weights/*
 src/pipeline/output/*
 node/node_modules
 .env
+src/pipeline/stream_video/*

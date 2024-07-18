@@ -1,4 +1,5 @@
 
+from modules.helper import rotation_image_proper
 from transformers import CLIPProcessor, CLIPModel
 import torch
 import clip
@@ -60,11 +61,64 @@ class ClipFast:
         self.classes =  ['dress', 'skirt', 'jacket', 'shirt', 'tshirt', 'pant', 'short']
         self.classes_prompt = [f'a photo of a {cl}' for cl in self.classes]
 
+    def rotate_wise(self, image):
+        rot_accuracy = []
+
+        for i in range(0,4):
+            rot_frame_rgb = rotation_image_proper(image, -90*i)
+            res = self.process(rot_frame_rgb)
+            rot_accuracy.append(res)
+
+        # Initialize an empty list to store unique items
+        unique_items = []
+
+        # Initialize an empty set to track items that have already been added
+        seen_items = set()
+
+        # Loop through each item and add it to the list if it's not a duplicate
+        for item in rot_accuracy:
+            if item[0] not in seen_items:
+                unique_items.append(item[0])
+                seen_items.add(item[0])
+
+        # Print the resulting list of unique items
+        item_list = []
+        for u_item in unique_items:
+            ls = [item for item in rot_accuracy if u_item in item]
+            item_list.append(ls)
+
+        # Initialize a dictionary to store sums and counts for each type
+        sums_counts = {}
+
+        # Iterate through the nested list to update sums and counts
+        for sublist in item_list:
+            for item in sublist:
+                item_type = item[0]
+                value = item[1]
+                
+                if item_type not in sums_counts:
+                    sums_counts[item_type] = {'sum': 0, 'count': 0}
+                
+                sums_counts[item_type]['sum'] += value
+                sums_counts[item_type]['count'] += 1
+
+        # Calculate the averages
+        averages = {}
+        for item_type, values in sums_counts.items():
+            averages[item_type] = values['sum'] / values['count']
+
+        # Print the resulting averages
+        #print(averages)
+        max_item_type = max(averages, key=averages.get)
+        return max_item_type
+
+
     def process(self, image):
         
         image = Image.fromarray(image)
 
         image_input = self.preprocess(image).unsqueeze(0).to(self.device)
+        self.classes_prompt = [f'a photo of a {cl}' for cl in self.classes]
         text = clip.tokenize(self.classes_prompt).to(self.device)
 
         with torch.no_grad():
@@ -76,7 +130,7 @@ class ClipFast:
         image_features /= image_features.norm(dim=-1, keepdim=True)
         text_features /= text_features.norm(dim=-1, keepdim=True)
         similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
-        values, indices = similarity[0].topk(3)
+        values, indices = similarity[0].topk(2)
 
 
         # Print the result
@@ -98,32 +152,10 @@ class ClipFast:
             print(f"Value: {value}, Index: {self.classes[index]}")
             paired_listing.append([self.classes[index], value.item()])
 
-        # for value, index in zip(values, indices):
-        #     print(f"{self.classes[index]:>16s}: {100 * value.item():.2f}%")
-        #     if value.item() > highest_value:
-        #         highest_value = value.item()
-        #         highest_pair = (self.classes[index], 100 * value.item())
-        #         highest_index = index
-                
         highest_pair = paired_listing[0]
 
         print("Highest Pair")
         print(highest_pair)
-
-        if paired_listing[0][0] == 'shirt' and paired_listing[1][0] == 'tshirt':
-            w, h = image.size
-            ratio = w / h
-            print(ratio)
-            if ratio <= 1.3:
-                highest_pair = paired_listing[1]
-
-
-        if paired_listing[0][0] == 'pant':
-            w, h = image.size
-            ratio = w / h
-            print(ratio)
-            if ratio <= 1.3:
-                highest_pair = paired_listing[2]
 
         # Return the highest value pair
         return highest_pair

@@ -1,0 +1,10 @@
+- Fragestellungen
+    Modellvarianten
+    Rotationen
+    Bildausschnitt
+
+
+    Klamotten ausgelegt vs nicht ausgelegt
+    10er Batches 
+
+    Hardwareverbrauch/Inferenzzeiten
