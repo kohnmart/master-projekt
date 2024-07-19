@@ -4,45 +4,6 @@ from transformers import CLIPProcessor, CLIPModel
 import torch
 import clip
 from PIL import Image
-class ClipClassifier: 
-
-    def __init__(self):
-        self.model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-        self.processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
-        self.image = None
-
-    def predictor(self, text_prompt):
-        inputs = self.processor(text=text_prompt, images=self.image, return_tensors="pt", padding=True)
-        outputs = self.model(**inputs)
-        logits_per_image = outputs.logits_per_image 
-        return logits_per_image.softmax(dim=1) 
-   
-    def get_label(self, probs, classes):
-        res_list = []
-        for i, prob in enumerate(probs[0]):
-            res_list.append([classes[i], prob.item()])
-        res_list.sort(key=lambda x: x[1], reverse=True)
-        print("RES: " + str(res_list[0]))
-        return res_list[0]
-
-    def classifier(self):
-        
-        probs = self.predictor(['a photo a upper body cloth type', 'a photo of a lower body cloth type'])
-        if probs[0][0].item() < probs[0][1].item():
-            probs = self.predictor(['a photo of a short pants', 'a photo of a long pants', 'a photo of a skirt'])
-            res = self.get_label(probs, ['short', 'pant', 'skirt'])
-
-        else: 
-            probs = self.predictor(['a photo of a short-sleeve top', 'a photo of a long-sleeve top'])
-            if probs[0][0].item() > probs[0][1].item():
-                probs = self.predictor(['a photo of a t-shirt', 'a photo of a polo-shirt', 'a photo of a dress'])
-                res = self.get_label(probs, ['t-shirt', 'polo', 'dress'])
-
-            else:
-                probs = self.predictor(['a photo of a sweatshirt', 'a photo of a jacket'])
-                res = self.get_label(probs, ['shirt', 'jacket'])
-        return res
-
 
 
 # Reference : https://github.com/openai/CLIP
@@ -58,10 +19,12 @@ class ClipFast:
         clip_model = model_name 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model, self.preprocess = clip.load(clip_model, device=self.device, jit=False)
-        self.classes =  ['dress', 'skirt', 'jacket', 'shirt', 'tshirt', 'pant', 'short']
-        self.classes_prompt = [f'a photo of a {cl}' for cl in self.classes]
 
-    def rotate_wise(self, image):
+
+    def process_on_rotation(self, image):
+
+        print("TEST")
+
         rot_accuracy = []
 
         for i in range(0,4):
@@ -110,6 +73,8 @@ class ClipFast:
         # Print the resulting averages
         #print(averages)
         max_item_type = max(averages, key=averages.get)
+        print("MAX ITEM TYPE")
+        print(max_item_type)
         return max_item_type
 
 
@@ -130,7 +95,7 @@ class ClipFast:
         image_features /= image_features.norm(dim=-1, keepdim=True)
         text_features /= text_features.norm(dim=-1, keepdim=True)
         similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
-        values, indices = similarity[0].topk(2)
+        values, indices = similarity[0].topk(3)
 
 
         # Print the result
@@ -160,4 +125,32 @@ class ClipFast:
         # Return the highest value pair
         return highest_pair
 
-                
+    
+
+    def clip_tree(self, keyed_frame, with_rotation):
+
+        self.classes = ['dress','jacket', 'shirt', 'pant']
+        print(with_rotation)
+        if with_rotation == 'True':
+            res = self.process_on_rotation(keyed_frame)
+        else:
+            res = self.process(keyed_frame)
+
+        res = self.subpath(res, 'pant',['short', 'trouser', 'jeans'], keyed_frame, with_rotation)
+
+        res = self.subpath(res, 'shirt',['sweatshirt', 'poloshirt', 'tshirt'], keyed_frame, with_rotation)
+
+
+        return res
+
+
+    
+    def subpath(self, res, parentClass, childs, keyed_frame, with_rotation):
+        if res == parentClass:
+            self.classes = childs
+            if with_rotation == 'True':
+                return self.process_on_rotation(keyed_frame)
+            else:
+                return self.process(keyed_frame)
+        else: 
+            return res
