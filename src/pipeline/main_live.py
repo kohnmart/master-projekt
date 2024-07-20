@@ -63,20 +63,19 @@ while cap.isOpened():
     # IF OBJECT IS DETECTED THEN RUN CLIP CLASSIFIER
     if is_detected_state:
         keyed_frame = cropped_image
-        print(choices['rotation'])
         detection = clip_instance.clip_tree(keyed_frame, choices['rotation'])
 
+        # CHECK IF SAME OBJECT IS DETECTED MULTIPLE TIMES WITHIN RANGE
         if (frame_count - 3 <= res_of_last_detection[1]):  
-            print("Detected same object")
             current_detection_list.append(detection)
             last_keyed_frame = keyed_frame
 
-
+        # ELSE NEW OBJECT DETECTED
         else:
             res_of_last_detection = [detection, frame_count]
             current_detection_list.append(detection)
 
-    
+    # 
     elif not is_detected_state and len(last_keyed_frame) != 0: 
         sorted_paired = sorted(current_detection_list, key=lambda x: x[1], reverse=True)
         cv2.imwrite(f"{full_path}/frame_{frame_count}_{detection}__.jpg", last_keyed_frame)
