@@ -28,7 +28,9 @@ class ClipFast:
         for i in range(0,4):
             rot_frame_rgb = rotation_image_proper(image, -90*i)
             res = self.process(rot_frame_rgb, log_info)
-            rot_accuracy.append(res)
+            for score in res:
+                   rot_accuracy.append(score)
+         
 
         # Initialize an empty list to store unique items
         unique_items = []
@@ -69,11 +71,12 @@ class ClipFast:
             averages[item_type] = values['sum'] / values['count']
 
         # Print the resulting averages
+        #print("AVERAGE")
         #print(averages)
-        max_item_type = max(averages, key=averages.get)
+        #max_item_type = max(averages, key=averages.get)
         #print("MAX ITEM TYPE")
         #print(max_item_type)
-        return max_item_type
+        return averages
 
 
     def process(self, image, log_info=False):
@@ -112,43 +115,48 @@ class ClipFast:
 
         # Iterate through the sorted pairs
         for value, index in sorted_paired:
-            if log_info:
-                print(f"Value: {value}, Index: {self.classes[index]}")
+            #if log_info:
+                #print(f"Value: {value}, Index: {self.classes[index]}")
             paired_listing.append([self.classes[index], value.item()])
-
-        highest_pair = paired_listing[0]
-
-        print("Highest Pair")
-        print(highest_pair)
+        print("-------------------")
 
         # Return the highest value pair
-        return highest_pair
+        return paired_listing
 
     
 
     def clip_tree(self, keyed_frame, with_rotation):
-
-        self.classes = ['dress','jacket', 'shirt', 'pant']
+        max_item_type = ''
+        averages = ''
+        self.classes = ['dress', 'shirt', 'pant']
         if with_rotation == 'True':
-            res = self.process_on_rotation(keyed_frame, log_info=False)
+            averages = self.process_on_rotation(keyed_frame, log_info=False)
+            max_item_type = max(averages, key=averages.get)
+            print(max_item_type)
         else:
             res = self.process(keyed_frame, log_info=False)
 
-        res = self.subpath(res, 'pant',['short', 'trouser', 'jeans'], keyed_frame, with_rotation, log_info=True)
-
-        res = self.subpath(res, 'shirt',['sweatshirt', 'poloshirt', 'tshirt'], keyed_frame, with_rotation, log_info=True)
 
 
+        res = self.subpath(averages, max_item_type, 'pant',['sportshort', 'trouser', 'jeans'], keyed_frame, with_rotation, True)
+
+        res = self.subpath(res, max_item_type, 'shirt',['sweatshirt', 'poloshirt', 'tshirt'], keyed_frame, with_rotation, True)
+
+        print("FINAL")
+        print(res)
         return res
 
 
     
-    def subpath(self, res, parentClass, childs, keyed_frame, with_rotation, log_info):
-        if res == parentClass:
+    def subpath(self, res, max_item_type, parentClass, childs, keyed_frame, with_rotation, log_info):
+        if max_item_type == parentClass:
             self.classes = childs
             if with_rotation == 'True':
+                print("TEST")
                 return self.process_on_rotation(keyed_frame, log_info=True)
             else:
                 return self.process(keyed_frame, log_info=True)
-        else: 
+
+        else:
             return res
+
