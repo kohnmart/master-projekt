@@ -8,3 +8,21 @@
     10er Batches 
 
     Hardwareverbrauch/Inferenzzeiten
+
+
+
+    Update Evaluation: (22-07-2024)
+
+    - Multiclassification für Klamotten?
+    - F1-Score Harmonische Mittelbildung aus Precision/Recall
+    - Nicht immer eindeutig zuweisbar?
+    - Eine Metrik nicht eindeutig und führt evntl zu höherer Error Rate
+    - Evntl sogar Frage nach Studie zum Klamottenlabeling
+        - Siehe Inter Annotator Agreement (NLP)
+
+    - Modellvarianten
+    - Rotationen 4-fach / 1-fach Vergleich
+    - Prompting einfach oder detailliert
+    - Treestructur flach odet tief
+
+    - pro sample csv Ausgabe zum prediction score relativ zu anderen Klassen

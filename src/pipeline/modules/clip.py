@@ -21,11 +21,11 @@ class ClipFast:
         self.model, self.preprocess = clip.load(clip_model, device=self.device, jit=False)
 
 
-    def process_on_rotation(self, image, log_info=False):
+    def process_on_rotation(self, image, rotation_amount=4, log_info=False):
 
         rot_accuracy = []
 
-        for i in range(0,4):
+        for i in range(0,rotation_amount):
             rot_frame_rgb = rotation_image_proper(image, -90*i)
             res = self.process(rot_frame_rgb, log_info)
             for score in res:
@@ -70,12 +70,6 @@ class ClipFast:
         for item_type, values in sums_counts.items():
             averages[item_type] = values['sum'] / values['count']
 
-        # Print the resulting averages
-        #print("AVERAGE")
-        #print(averages)
-        #max_item_type = max(averages, key=averages.get)
-        #print("MAX ITEM TYPE")
-        #print(max_item_type)
         return averages
 
 
@@ -100,7 +94,6 @@ class ClipFast:
 
 
         # Print the result
-        #print("\nTop predictions:\n")
         highest_value = -1
         highest_pair = None
         highest_index = -1
@@ -130,11 +123,13 @@ class ClipFast:
         averages = ''
         self.classes = ['dress', 'shirt', 'pant']
         if with_rotation == 'True':
-            averages = self.process_on_rotation(keyed_frame, log_info=False)
+            averages = self.process_on_rotation(keyed_frame, rotation_amount=4, log_info=False)
             max_item_type = max(averages, key=averages.get)
             print(max_item_type)
         else:
-            res = self.process(keyed_frame, log_info=False)
+            averages = self.process_on_rotation(keyed_frame, rotation_amount=1, log_info=False)
+            max_item_type = max(averages, key=averages.get)
+            print(max_item_type)
 
 
 
@@ -142,8 +137,6 @@ class ClipFast:
 
         res = self.subpath(res, max_item_type, 'shirt',['sweatshirt', 'poloshirt', 'tshirt'], keyed_frame, with_rotation, True)
 
-        print("FINAL")
-        print(res)
         return res
 
 
@@ -152,10 +145,10 @@ class ClipFast:
         if max_item_type == parentClass:
             self.classes = childs
             if with_rotation == 'True':
-                print("TEST")
-                return self.process_on_rotation(keyed_frame, log_info=True)
+                return self.process_on_rotation(keyed_frame, rotation_amount=4, log_info=True)
             else:
-                return self.process(keyed_frame, log_info=True)
+                print("TESTER")
+                return self.process_on_rotation(keyed_frame, rotation_amount=1, log_info=True)
 
         else:
             return res

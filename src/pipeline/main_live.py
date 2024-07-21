@@ -78,10 +78,7 @@ while cap.isOpened():
     # REALEASE OBJECT
     elif not is_detected_state and len(last_keyed_frame) != 0: 
         #sorted_paired = sorted(current_detection_list, key=lambda x: x[1], reverse=True)
-        print(current_detection_list)
         avg_total, max_item = calculate_averages(current_detection_list)
-        print("DETECTION LIST")
-        print(avg_total)
         cv2.imwrite(f"{full_path}/frame_{frame_count}_{max_item}__.jpg", last_keyed_frame)
 
         # Convert original data to DataFrame
