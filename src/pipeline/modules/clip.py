@@ -123,15 +123,15 @@ class ClipFast:
             averages = self.process_on_rotation(keyed_frame, rotation_amount=1)
             max_item_type = max(averages, key=averages.get)
 
-        res = self.subpath(averages, max_item_type, 'pant',['trouser', 'jogger', 'training short', 'bermuda short', 'chinopant', 'cargopant', 'leggins'], keyed_frame, with_rotation)
+        res = self.subpath(averages, max_item_type, 'pant',['pant', 'skirt', 'short'], keyed_frame, with_rotation)
 
-        res = self.subpath(res, max_item_type, 'shirt',['sweatshirt', 'poloshirt', 'tshirt'], keyed_frame, with_rotation)
+        res = self.subpath(res, max_item_type, 'shirt',['shirt', 'sweatshirt', 'sweatshirt', 't-shirt'], keyed_frame, with_rotation)
 
         return res, averages
 
     
     def clip_decision_plain(self, keyed_frame, with_rotation):
-        self.classes = ['dress', 'shirt', 'short', 'pant', 'jacket', 'polo']
+        self.classes = ['dress', 'skirt', 'sweatshirt', 'shirt', 'short', 'pant', 'jacket', 'poloshirt', 't-shirt']
         if with_rotation == True:
             return self.process_on_rotation(keyed_frame, rotation_amount=4)
         else:

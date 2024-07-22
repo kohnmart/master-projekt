@@ -7,6 +7,17 @@ from modules.helper import load_images_from_folder, plot_images, calculate_avera
 from modules.choices import make_choices
 import pandas as pd
 
+
+###################################
+
+#   This script features the entire production pipeline from taking in the video sequence  
+#   extracting objects and classification. Model and Input configurations can 
+#   be set prior to start. Sample gets exported with its predicted label category as well as 
+#   an individual csv file logging prediction scores to plain or decision-tree. 
+#
+
+###################################
+
 ###### CHOICES CONFIGURATION ######
 
 choices = make_choices()
@@ -55,7 +66,7 @@ while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
-    print(frame_count)
+    print(f'\rFrame Count: {frame_count}', end='', flush=True)
 
     # PERFORMING YOLO TO RETRIEVE OBJECTS
     is_detected_state, cropped_image = yolo_instance.process(frame)
@@ -83,20 +94,24 @@ while cap.isOpened():
     # REALEASE OBJECT
     elif not is_detected_state and len(last_keyed_frame) != 0: 
         avg_total, max_item = calculate_averages(current_detection_list)
-        cv2.imwrite(f"{full_path}/frame_{frame_count}_{max_item}__.jpg", last_keyed_frame)
-        print("PARENT")
-        print(parent_averages)
-        # Convert original data to DataFrame
-        df_data = pd.DataFrame([parent_averages], index=['parent-average'])
+        cv2.imwrite(f"{full_path}/frame{frame_count}_{max_item}.jpg", last_keyed_frame)
 
-        # Convert averages to DataFrame
-        df_averages = pd.DataFrame([avg_total], index=['average'])
+        if choices['decision_tree'] == True:
+            # Convert original data to DataFrame
+            df_data = pd.DataFrame([parent_averages], index=['parent-tree-avg'])
 
-        # Concatenate the two DataFrames
-        df_combined = pd.concat([df_data, df_averages])
+            # Convert averages to DataFrame
+            df_averages = pd.DataFrame([avg_total], index=['sub-tree-avg'])
+
+            # Concatenate the two DataFrames
+            df_combined = pd.concat([df_data, df_averages])
+
+        else:
+            # Convert averages to DataFrame
+            df_combined = pd.DataFrame([avg_total], index=['plain-avg'])
 
         # Save the combined DataFrame to CSV
-        csv_file = f"{full_path}/frame_{frame_count}_{max_item}__.csv"
+        csv_file = f"{full_path}/frame_{frame_count}_{max_item}.csv"
         df_combined.to_csv(csv_file)
 
 

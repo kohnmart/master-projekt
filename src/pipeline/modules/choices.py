@@ -26,12 +26,12 @@ def find_highest_version(files, base_name):
 
     return highest_version
 
-def make_choices():
+def make_choices(path):
     # List files in the stream video directory
-    file_choices = list_files_in_directory('./stream_video')
+    file_choices = list_subdirectories(path)
     
     if not file_choices:
-        print("No files found in the directory: ./stream_video")
+        print("No files found in the directory")
         return
 
     # Prompt the user to select a file

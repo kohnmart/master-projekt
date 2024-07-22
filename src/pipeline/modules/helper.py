@@ -77,7 +77,7 @@ def load_images_from_folder(folder):
     filenames = []
     for filename in os.listdir(folder):
         if filename.endswith(".png") or filename.endswith(".jpg"):  # Add other extensions if needed
-            img = Image.open(os.path.join(folder, filename))
+            img = cv2.imread(os.path.join(folder, filename))
             if img is not None:
                 images.append(img)
                 filenames.append(filename)
