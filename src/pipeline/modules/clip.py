@@ -21,13 +21,13 @@ class ClipFast:
         self.model, self.preprocess = clip.load(clip_model, device=self.device, jit=False)
 
 
-    def process_on_rotation(self, image, rotation_amount=4, log_info=False):
+    def process_on_rotation(self, image, rotation_amount=4):
 
         rot_accuracy = []
 
-        for i in range(0,rotation_amount):
+        for i in range(0, rotation_amount):
             rot_frame_rgb = rotation_image_proper(image, -90*i)
-            res = self.process(rot_frame_rgb, log_info)
+            res = self.process(rot_frame_rgb)
             for score in res:
                    rot_accuracy.append(score)
          
@@ -73,7 +73,7 @@ class ClipFast:
         return averages
 
 
-    def process(self, image, log_info=False):
+    def process(self, image):
         
         image = Image.fromarray(image)
 
@@ -90,7 +90,7 @@ class ClipFast:
         image_features /= image_features.norm(dim=-1, keepdim=True)
         text_features /= text_features.norm(dim=-1, keepdim=True)
         similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
-        values, indices = similarity[0].topk(3)
+        values, indices = similarity[0].topk(len(self.classes))
 
 
         # Print the result
@@ -106,49 +106,47 @@ class ClipFast:
         # Sort pairs by the first element (value)
         sorted_paired = sorted(paired, key=lambda x: x[0], reverse=True)
 
-        # Iterate through the sorted pairs
         for value, index in sorted_paired:
-            #if log_info:
-                #print(f"Value: {value}, Index: {self.classes[index]}")
-            paired_listing.append([self.classes[index], value.item()])
-        print("-------------------")
-
-        # Return the highest value pair
+            paired_listing.append([self.classes[index], value.item()])  
         return paired_listing
 
     
 
-    def clip_tree(self, keyed_frame, with_rotation):
+    def clip_decision_tree(self, keyed_frame, with_rotation):
         max_item_type = ''
         averages = ''
         self.classes = ['dress', 'shirt', 'pant']
-        if with_rotation == 'True':
-            averages = self.process_on_rotation(keyed_frame, rotation_amount=4, log_info=False)
+        if with_rotation == True:
+            averages = self.process_on_rotation(keyed_frame, rotation_amount=4)
             max_item_type = max(averages, key=averages.get)
-            print(max_item_type)
         else:
-            averages = self.process_on_rotation(keyed_frame, rotation_amount=1, log_info=False)
+            averages = self.process_on_rotation(keyed_frame, rotation_amount=1)
             max_item_type = max(averages, key=averages.get)
-            print(max_item_type)
 
+        res = self.subpath(averages, max_item_type, 'pant',['trouser', 'jogger', 'training short', 'bermuda short', 'chinopant', 'cargopant', 'leggins'], keyed_frame, with_rotation)
 
-
-        res = self.subpath(averages, max_item_type, 'pant',['sportshort', 'trouser', 'jeans'], keyed_frame, with_rotation, True)
-
-        res = self.subpath(res, max_item_type, 'shirt',['sweatshirt', 'poloshirt', 'tshirt'], keyed_frame, with_rotation, True)
+        res = self.subpath(res, max_item_type, 'shirt',['sweatshirt', 'poloshirt', 'tshirt'], keyed_frame, with_rotation)
 
         return res
 
+    
+    def clip_decision_plain(self, keyed_frame, with_rotation):
+        self.classes = ['dress', 'shirt', 'short', 'pant', 'jacket', 'polo']
+        if with_rotation == True:
+            return self.process_on_rotation(keyed_frame, rotation_amount=4)
+        else:
+            return self.process_on_rotation(keyed_frame, rotation_amount=1)
+
+
 
     
-    def subpath(self, res, max_item_type, parentClass, childs, keyed_frame, with_rotation, log_info):
+    def subpath(self, res, max_item_type, parentClass, childs, keyed_frame, with_rotation):
         if max_item_type == parentClass:
             self.classes = childs
-            if with_rotation == 'True':
-                return self.process_on_rotation(keyed_frame, rotation_amount=4, log_info=True)
+            if with_rotation == True:
+                return self.process_on_rotation(keyed_frame, rotation_amount=4)
             else:
-                print("TESTER")
-                return self.process_on_rotation(keyed_frame, rotation_amount=1, log_info=True)
+                return self.process_on_rotation(keyed_frame, rotation_amount=1)
 
         else:
             return res

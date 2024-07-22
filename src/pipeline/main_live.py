@@ -60,11 +60,16 @@ while cap.isOpened():
     # PERFORMING YOLO TO RETRIEVE OBJECTS
     is_detected_state, cropped_image = yolo_instance.process(frame)
 
+    detection_score = {}
+
     # IF OBJECT IS DETECTED THEN RUN CLIP CLASSIFIER
     if is_detected_state:
         keyed_frame = cropped_image
-        detection_score = clip_instance.clip_tree(keyed_frame, choices['rotation'])
+        if choices['decision_tree'] == True:
+            detection_score = clip_instance.clip_decision_tree(keyed_frame, choices['rotation'])
 
+        else:
+            detection_score = clip_instance.clip_decision_plain(keyed_frame, choices['rotation'])
         # CHECK IF SAME OBJECT IS DETECTED MULTIPLE TIMES WITHIN RANGE
         if (frame_count - 3 <= res_of_last_detection[1]):  
             current_detection_list.append(detection_score)
@@ -77,7 +82,6 @@ while cap.isOpened():
 
     # REALEASE OBJECT
     elif not is_detected_state and len(last_keyed_frame) != 0: 
-        #sorted_paired = sorted(current_detection_list, key=lambda x: x[1], reverse=True)
         avg_total, max_item = calculate_averages(current_detection_list)
         cv2.imwrite(f"{full_path}/frame_{frame_count}_{max_item}__.jpg", last_keyed_frame)
 

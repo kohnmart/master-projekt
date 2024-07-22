@@ -46,9 +46,16 @@ def make_choices():
     rotation_question = [
         inquirer.List('rotation_choice',
                       message="Applying 90-wise rotations during classification?",
-                      choices=['True', 'False'])
+                      choices=[True, False])
     ]
     rotation_answer = inquirer.prompt(rotation_question)
+
+    decision_tree_question = [
+        inquirer.List('tree_choice',
+                      message="Decision Tree or Plain use?",
+                      choices=[True, False])
+    ]
+    decision_tree_answer = inquirer.prompt(decision_tree_question)
 
     # Prompt the user to select a clip model
     clip_model_question = [
@@ -67,7 +74,7 @@ def make_choices():
 
     # List files in the output directory
     outputs_list = list_subdirectories('./output')
-    concat_output_name = f"{file_answer['file_choice'].split('.')[0]}_{rotation_answer['rotation_choice']}_{clip}_v"
+    concat_output_name = f"{file_answer['file_choice'].split('.')[0]}_{decision_tree_answer['tree_choice']}_{rotation_answer['rotation_choice']}_{clip}_v"
 
     # Find the highest version of files matching the pattern
     highest_version = find_highest_version(outputs_list, concat_output_name)
@@ -87,5 +94,6 @@ def make_choices():
         "rotation": rotation_answer['rotation_choice'],
         "clip": clip_model_answer['clip_model_choice'],
         "concat_name": output_name_answer['output_name'],
-        "time_start": seq_entry_answer['seq_entry_choice']
+        "time_start": seq_entry_answer['seq_entry_choice'],
+        "decision_tree": decision_tree_answer['tree_choice']
     }
