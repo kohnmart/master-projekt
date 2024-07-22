@@ -127,7 +127,7 @@ class ClipFast:
 
         res = self.subpath(res, max_item_type, 'shirt',['sweatshirt', 'poloshirt', 'tshirt'], keyed_frame, with_rotation)
 
-        return res
+        return res, averages
 
     
     def clip_decision_plain(self, keyed_frame, with_rotation):

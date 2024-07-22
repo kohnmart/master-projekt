@@ -66,7 +66,7 @@ while cap.isOpened():
     if is_detected_state:
         keyed_frame = cropped_image
         if choices['decision_tree'] == True:
-            detection_score = clip_instance.clip_decision_tree(keyed_frame, choices['rotation'])
+            detection_score, parent_averages = clip_instance.clip_decision_tree(keyed_frame, choices['rotation'])
 
         else:
             detection_score = clip_instance.clip_decision_plain(keyed_frame, choices['rotation'])
@@ -84,19 +84,20 @@ while cap.isOpened():
     elif not is_detected_state and len(last_keyed_frame) != 0: 
         avg_total, max_item = calculate_averages(current_detection_list)
         cv2.imwrite(f"{full_path}/frame_{frame_count}_{max_item}__.jpg", last_keyed_frame)
-
+        print("PARENT")
+        print(parent_averages)
         # Convert original data to DataFrame
-        #df_data = pd.DataFrame(current_detection_list)
+        df_data = pd.DataFrame([parent_averages], index=['parent-average'])
 
         # Convert averages to DataFrame
         df_averages = pd.DataFrame([avg_total], index=['average'])
 
         # Concatenate the two DataFrames
-        #df_combined = pd.concat([df_data, df_averages])
+        df_combined = pd.concat([df_data, df_averages])
 
         # Save the combined DataFrame to CSV
         csv_file = f"{full_path}/frame_{frame_count}_{max_item}__.csv"
-        df_averages.to_csv(csv_file)
+        df_combined.to_csv(csv_file)
 
 
         last_keyed_frame = []
