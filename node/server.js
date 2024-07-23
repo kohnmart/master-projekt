@@ -11,7 +11,12 @@ app.use(express.static('public'));
 
 app.use(
   '/images',
-  express.static(path.join(__dirname, '../dataset/classifier/train/dress/'))
+  express.static(
+    path.join(
+      __dirname,
+      '../dataset/classifier/train/recording_2024-07-05-9_base/'
+    )
+  )
 );
 
 app.use(structRoutes);

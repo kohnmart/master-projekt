@@ -20,7 +20,7 @@ import pandas as pd
 
 ###### CHOICES CONFIGURATION ######
 
-choices = make_choices()
+choices = make_choices(path='./stream_video')
 
 
 ###### SETUP ######
@@ -67,6 +67,8 @@ while cap.isOpened():
     if not ret:
         break
     print(f'\rFrame Count: {frame_count}', end='', flush=True)
+
+    frame = np.rot90(frame)
 
     # PERFORMING YOLO TO RETRIEVE OBJECTS
     is_detected_state, cropped_image = yolo_instance.process(frame)

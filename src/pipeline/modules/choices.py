@@ -28,8 +28,13 @@ def find_highest_version(files, base_name):
 
 def make_choices(path):
     # List files in the stream video directory
-    file_choices = list_subdirectories(path)
+    if path == './stream_extracted':
+        file_choices = list_subdirectories(path)
     
+    else:
+        file_choices = list_files_in_directory(path)
+    
+
     if not file_choices:
         print("No files found in the directory")
         return
@@ -61,7 +66,7 @@ def make_choices(path):
     clip_model_question = [
         inquirer.List('clip_model_choice',
                       message="Choose clip model",
-                      choices=["RN50", "RN101", "RN50x4", "RN50x16", "ViT-B/14", "ViT-B/16", "ViT-B/32"])
+                      choices=["RN50", "RN101", "RN50x4", "RN50x16", "ViT-L/14", "ViT-B/16", "ViT-B/32"])
     ]
     clip_model_answer = inquirer.prompt(clip_model_question)
     clip = clip_model_answer['clip_model_choice'].replace('/', '-')

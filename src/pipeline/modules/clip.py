@@ -11,7 +11,7 @@ from PIL import Image
 class ClipFast: 
 
     """
-    model_name: ["RN50", "RN101", "RN50x4", "RN50x16", "ViT-B/14", "ViT-B/16", "ViT-B/32"]
+    model_name: ["RN50", "RN101", "RN50x4", "RN50x16", "ViT-L/14", "ViT-B/16", "ViT-B/32"]
 
     """
 

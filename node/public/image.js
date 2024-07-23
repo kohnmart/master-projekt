@@ -62,6 +62,7 @@ function loadImage(url) {
 }
 
 async function loadImages() {
+  console.log('TEST');
   try {
     state.images = await fetchImages();
   } catch (error) {

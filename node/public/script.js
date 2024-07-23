@@ -14,7 +14,7 @@ import {
   saveBoundingBoxes,
 } from './canvas.js';
 
-import getFolderStructure from './fetch.js';
+import { getFolderStructure } from './fetch.js';
 
 const sampleLengthTotalElement = document.createElement('p');
 sampleLengthTotalElement.id = 'counter';

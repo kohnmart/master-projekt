@@ -1,6 +1,7 @@
-import axios from 'axios';
+// fetch.js
 
 const fetchImages = async () => {
+  console.log('CALL');
   try {
     const response = await axios.get('/images');
     return response.data;
@@ -22,7 +23,7 @@ const fetchBboxes = async (id) => {
   }
 };
 
-const fetchAllBboxes = async (id) => {
+const fetchAllBboxes = async () => {
   try {
     const url = `/canvas`;
     const response = await axios.get(url);

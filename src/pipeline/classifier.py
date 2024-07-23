@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 ###################################
 
 ###### CHOICES CONFIGURATION ######
-path = './output'
+path = './stream_extracted'
 choices = make_choices(path)
 
 
@@ -89,8 +89,6 @@ plot_images(images, filenames, full_path)
 print("Plot saved...")
 
 ###### Confusion Matrix ######
-print(true_labels)
-print(predicted_labels)
 print("Creating conf matrix...")
 
 classes =  ['dress', 'skirt', 'sweatshirt', 'shirt', 'short', 'pant', 'jacket', 'poloshirt', 't-shirt']
