@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import os 
-from modules.yolo import YOLOS
+from modules.yolo import ObjectDetector
 from modules.clip import ClipFast
 from modules.helper import load_images_from_folder, plot_images, calculate_averages
 from modules.choices import make_choices
@@ -28,7 +28,7 @@ choices = make_choices(path='./stream_video')
 print('Launching...')
 
 clip_instance = ClipFast(model_name=choices['clip'])
-yolo_instance = YOLOS()
+yolo_instance = ObjectDetector(model_type='yolos')
 
 
 file_name = choices['file']
@@ -67,9 +67,7 @@ while cap.isOpened():
     if not ret:
         break
     print(f'\rFrame Count: {frame_count}', end='', flush=True)
-
     frame = np.rot90(frame)
-
     # PERFORMING YOLO TO RETRIEVE OBJECTS
     is_detected_state, cropped_image = yolo_instance.process(frame)
 
