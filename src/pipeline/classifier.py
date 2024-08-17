@@ -7,15 +7,9 @@ from modules.choices import make_choices
 import pandas as pd
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score, precision_score, recall_score
 import matplotlib.pyplot as plt
-###################################
 
-#   This script features the entire production pipeline from taking in the video sequence  
-#   extracting objects and classification. Model and Input configurations can 
-#   be set prior to start. Sample gets exported with its predicted label category as well as 
-#   an individual csv file logging prediction scores to plain or decision-tree. 
-#
 
-###################################
+
 
 ###### CHOICES CONFIGURATION ######
 path = './stream_extracted'

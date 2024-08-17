@@ -8,15 +8,13 @@ from modules.choices import make_choices
 import pandas as pd
 
 
-###################################
+#   EXTRACTOR AND PRE-CLASSIFIER Script
+#   This script features video sample extraction as well as pre-classification
 
-#   This script features the entire production pipeline from taking in the video sequence  
-#   extracting objects and classification. Model and Input configurations can 
-#   be set prior to start. Sample gets exported with its predicted label category as well as 
-#   an individual csv file logging prediction scores to plain or decision-tree. 
-#
+#   Image saving: filename _ predicted  _ class
+#   run - python video_seq_to_classifier.py 
+#   follow choices
 
-###################################
 
 ###### CHOICES CONFIGURATION ######
 
@@ -95,26 +93,6 @@ while cap.isOpened():
     elif not is_detected_state and len(last_keyed_frame) != 0: 
         avg_total, max_item = calculate_averages(current_detection_list)
         cv2.imwrite(f"{full_path}/frame{frame_count}_{max_item}.jpg", last_keyed_frame)
-
-        if choices['decision_tree'] == True:
-            # Convert original data to DataFrame
-            df_data = pd.DataFrame([parent_averages], index=['parent-tree-avg'])
-
-            # Convert averages to DataFrame
-            df_averages = pd.DataFrame([avg_total], index=['sub-tree-avg'])
-
-            # Concatenate the two DataFrames
-            df_combined = pd.concat([df_data, df_averages])
-
-        else:
-            # Convert averages to DataFrame
-            df_combined = pd.DataFrame([avg_total], index=['plain-avg'])
-
-        # Save the combined DataFrame to CSV
-        csv_file = f"{full_path}/frame_{frame_count}_{max_item}.csv"
-        df_combined.to_csv(csv_file)
-
-
         last_keyed_frame = []
         current_detection_list = []
 

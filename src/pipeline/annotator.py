@@ -5,6 +5,16 @@ from mongo import MONGO
 from clip import ClipClassifier
 import numpy as np
 
+
+#   PRE ANNOTATOR
+#   This script features pre annotations with SAM and CLIP
+#   Saving into MongoDB
+#   Use Node.js ENV for interaction
+
+#   run - python annotator.py
+#   follow choices
+
+
 print('Launching...')
 
 sam_instance = SAM()

@@ -1,5 +1,6 @@
 
 from modules.helper import rotation_image_proper
+import modules.cloth_classes as clth_classes
 from transformers import CLIPProcessor, CLIPModel
 import torch
 import clip
@@ -16,6 +17,7 @@ class ClipFast:
     """
 
     def __init__(self, model_name):
+        torch.cuda.empty_cache()
         clip_model = model_name 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model, self.preprocess = clip.load(clip_model, device=self.device, jit=False)
@@ -81,9 +83,24 @@ class ClipFast:
         self.classes_prompt = [f'a photo of a {cl}' for cl in self.classes]
         text = clip.tokenize(self.classes_prompt).to(self.device)
 
-        with torch.no_grad():
-            image_features = self.model.encode_image(image_input)
+        avg_encoding = False
+        image_features = []
+        text_features = []
+        if avg_encoding:
+            encoded_images = []
+            rotations = [0, 90, 180, 270]
+            for rotation in rotations:
+                rotated_image = torch.rot90(image_input, k=rotation//90, dims=(2, 3))
+                encoded_image = self.model.encode_image(rotated_image)
+                encoded_images.append(encoded_image)
+        
+            image_features = torch.mean(torch.stack(encoded_images), dim=0)
             text_features = self.model.encode_text(text)
+
+        else:
+            with torch.no_grad():
+                image_features = self.model.encode_image(image_input)
+                text_features = self.model.encode_text(text)
 
         
         # Pick the top 5 most similar labels for the image
@@ -115,7 +132,7 @@ class ClipFast:
     def clip_decision_tree(self, keyed_frame, with_rotation):
         max_item_type = ''
         averages = ''
-        self.classes = ['dress', 'shirt', 'pant']
+        self.classes = clth_classes.get_high_level_classes()
         if with_rotation == True:
             averages = self.process_on_rotation(keyed_frame, rotation_amount=4)
             max_item_type = max(averages, key=averages.get)
@@ -123,15 +140,30 @@ class ClipFast:
             averages = self.process_on_rotation(keyed_frame, rotation_amount=1)
             max_item_type = max(averages, key=averages.get)
 
-        res = self.subpath(averages, max_item_type, 'pant',['pant', 'skirt', 'short'], keyed_frame, with_rotation)
+        upperwear_tree = clth_classes.get_upperwear_tree()
+        underwear_tree = clth_classes.get_underwear_tree()
 
-        res = self.subpath(res, max_item_type, 'shirt',['shirt', 'sweatshirt', 'sweatshirt', 't-shirt'], keyed_frame, with_rotation)
+        # decision tree
+
+        res = self.subpath(averages, max_item_type, 'pant', underwear_tree, keyed_frame, with_rotation)
+        updated_clothing_scores = {}
+        for item, score in res.items():
+            if item == 'short pant':
+                updated_clothing_scores['short'] = score
+            elif item == 'long pant':
+                updated_clothing_scores['pant'] = score
+            else:
+                updated_clothing_scores[item] = score
+
+        res = updated_clothing_scores
+
+        res = self.subpath(res, max_item_type, 'shirt', upperwear_tree, keyed_frame, with_rotation)
 
         return res, averages
 
     
     def clip_decision_plain(self, keyed_frame, with_rotation):
-        self.classes = ['dress', 'skirt', 'sweatshirt', 'shirt', 'short', 'pant', 'jacket', 'poloshirt', 't-shirt']
+        self.classes = clth_classes.get_all_classes()
         if with_rotation == True:
             return self.process_on_rotation(keyed_frame, rotation_amount=4)
         else:
