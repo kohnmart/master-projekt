@@ -1,19 +1,20 @@
 
-from modules.helper import rotation_image_proper
-import modules.cloth_classes as clth_classes
-from transformers import CLIPProcessor, CLIPModel
-import torch
 import clip
+import torch
+
 from PIL import Image
+from transformers import CLIPProcessor, CLIPModel
 
 
-# Reference : https://github.com/openai/CLIP
+from modules.cloth_categories import ClothingCategories
+from modules.helper.vision import rotation_image_proper
+
 
 class ClipFast: 
 
     """
-    model_name: ["RN50", "RN101", "RN50x4", "RN50x16", "ViT-L/14", "ViT-B/16", "ViT-B/32"]
-
+    model_options: ["RN50", "RN101", "RN50x4", "RN50x16", "ViT-L/14", "ViT-B/16", "ViT-B/32"]
+    source: https://github.com/openai/CLIP
     """
 
     def __init__(self, model_name):
@@ -132,7 +133,7 @@ class ClipFast:
     def clip_decision_tree(self, keyed_frame, with_rotation):
         max_item_type = ''
         averages = ''
-        self.classes = clth_classes.get_high_level_classes()
+        self.classes = ClothingCategories.get_high_level_classes()
         if with_rotation == True:
             averages = self.process_on_rotation(keyed_frame, rotation_amount=4)
             max_item_type = max(averages, key=averages.get)
@@ -140,8 +141,8 @@ class ClipFast:
             averages = self.process_on_rotation(keyed_frame, rotation_amount=1)
             max_item_type = max(averages, key=averages.get)
 
-        upperwear_tree = clth_classes.get_upperwear_tree()
-        underwear_tree = clth_classes.get_underwear_tree()
+        upperwear_tree = ClothingCategories.get_upperwear_tree()
+        underwear_tree = ClothingCategories.get_underwear_tree()
 
         # decision tree
 
@@ -163,7 +164,7 @@ class ClipFast:
 
     
     def clip_decision_plain(self, keyed_frame, with_rotation):
-        self.classes = clth_classes.get_all_classes()
+        self.classes = ClothingCategories.get_all_classes()
         if with_rotation == True:
             return self.process_on_rotation(keyed_frame, rotation_amount=4)
         else:

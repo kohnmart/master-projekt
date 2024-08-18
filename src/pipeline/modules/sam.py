@@ -9,10 +9,6 @@ from PIL import Image
 from matplotlib import patches
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 
-# custom
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '../../')))
-from config.path import get_training_data_path, DATASET_PATH_TYPE
-
 class SAM:
 
     def __init__(self):

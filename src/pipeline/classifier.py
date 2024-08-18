@@ -1,13 +1,53 @@
+import os 
 import cv2
 import numpy as np
-import os 
-from modules.clip import ClipFast
-from modules.helper import load_images_from_folder, plot_images, calculate_averages
-from modules.choices import make_choices
 import pandas as pd
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score, precision_score, recall_score
-import matplotlib.pyplot as plt
 
+from modules.clip import ClipFast
+from modules.cloth_categories import ClothingCategories
+
+from modules.choices import make_choices
+
+from modules.helper.loader import load_images_from_folder
+from modules.helper.plotting import plot_images, generate_and_plot_conf
+from modules.helper.calc import calculate_averages
+
+
+"""
+This script performs image classification and analysis using the ClipFast model and a predefined set of choices by user.
+
+The script loads images from a specified folder, processes them through the ClipFast model using either a decision tree 
+or plain classification method, saves the classification results, and generates a plot of the images with their predicted 
+labels. Additionally, it generates and saves a confusion matrix to evaluate the model's performance.
+
+Modules and Functions:
+- `ClipFast`: A custom module for processing images with the CLIP model.
+- `get_all_classes`: Retrieves all possible class labels for the classification task.
+- `make_choices`: Generates configuration choices such as model selection, file paths, and processing options.
+- `load_images_from_folder`: Loads images and their filenames from a specified folder.
+- `plot_images`: Generates and saves a plot of the images with their predicted labels.
+- `calculate_averages`: Used to compute average scores during the decision tree process.
+
+Process:
+1. **CHOICES CONFIGURATION**: Loads configuration choices from a specified path.
+2. **SETUP**: Initializes the CLIP model based on the selected choices and prepares the folder structure for outputs.
+3. **CAPTURE RUN**: 
+   - Iterates over the images, classifies each image, and saves the result as an image and CSV file.
+   - If a decision tree method is used, additional average calculations are performed and saved.
+4. **SAVE OUT PLOT**: Generates and saves a plot of all processed images with their predicted labels.
+5. **CONFUSION MATRIX**: Computes and saves a confusion matrix to evaluate the classification performance against true labels.
+
+Outputs:
+- Processed images with their predicted labels saved in the specified "./output/x" folder.
+- CSV files containing detection scores and if applicable, parent tree averages to trace back on errors.
+- A plot of processed images with labels.
+- A confusion matrix plot to evaluate classification accuracy.
+
+Usage:
+Run this script in a Python environment after configuring the required paths and choices. Ensure that the input images are 
+located in the specified folder and that the necessary modules are available.
+
+"""
 
 
 
@@ -79,31 +119,19 @@ for i, keyed_frame in enumerate(images):
 ###### SAVE OUT PLOT ######
 
 print("Creating plot...")
+export_path = full_path
+images, filenames = load_images_from_folder(export_path)
+
 plot_images(images, filenames, full_path)
 print("Plot saved...")
 
 ###### Confusion Matrix ######
 print("Creating conf matrix...")
 
-classes =  ['dress', 'skirt', 'sweatshirt', 'shirt', 'short', 'pant', 'jacket', 'poloshirt', 't-shirt']
+classes = ClothingCategories.get_all_classes()
 
-# Calculate the confusion matrix
-cm = confusion_matrix(true_labels, predicted_labels, labels=classes)
-
-# Calculate accuracy, precision, and recall
-accuracy = accuracy_score(true_labels, predicted_labels)
-# precision = precision_score(true_labels, predicted_labels, average='macro')
-# recall = recall_score(true_labels, predicted_labels, average='macro')
-
-# Display the confusion matrix
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=classes)
-fig, ax = plt.subplots(figsize=(10, 10))
-disp.plot(cmap=plt.cm.Blues, xticks_rotation='vertical', ax=ax)
-
-# Add accuracy, precision, and recall to the plot
-ax.text(0.5, -0.2, f'Accuracy: {accuracy:.2f}', transform=ax.transAxes, fontsize=12, verticalalignment='top', horizontalalignment='center')
-
-plt.title("Confusion Matrix for Multi-Class Classification")
-plt.savefig(f"{full_path}/confusion_matrix.png")
+generate_and_plot_conf(true_labels, predicted_labels, classes, full_path)
 
 print("Conf matrix saved...")
+
+print("Finished...")
