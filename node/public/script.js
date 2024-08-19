@@ -1,101 +1,141 @@
 import {
-  displayImage,
-  nextImage,
-  prevImage,
-  imageDelete,
-  loadImages,
-  state,
+    displayImage,
+    nextImage,
+    prevImage,
+    loadImages,
+    state,
 } from './image.js';
 
 import {
-  canvas,
-  deleteFromCanvas,
-  enableRectangleDrawing,
-  saveBoundingBoxes,
+    canvas,
+    deleteFromCanvas,
+    enableRectangleDrawing,
+    saveBoundingBoxes,
 } from './canvas.js';
 
-import { getFolderStructure } from './fetch.js';
+import { getFolderStructure, putImageFileName } from './fetch.js';
 
 const sampleLengthTotalElement = document.createElement('p');
 sampleLengthTotalElement.id = 'counter';
 const clear = document.getElementById('clearCanvas');
 clear.addEventListener('click', deleteFromCanvas);
 
+let counter = 0;
+
 document
-  .getElementById('addRectangle')
-  .addEventListener('click', enableRectangleDrawing);
+    .getElementById('addRectangle')
+    .addEventListener('click', enableRectangleDrawing);
 
 document.addEventListener('DOMContentLoaded', async () => {
-  setupKeyboardNavigation();
-  addClothTypes();
-  getFolderStructure();
-  await loadImages();
-  sampleLengthTotalElement.textContent = `0 / ${state.images.length}`;
-  actions.appendChild(sampleLengthTotalElement);
-  displayImage();
+    setupKeyboardNavigation();
+    addClothTypes();
+    //getFolderStructure();
+    await loadImages();
+    sampleLengthTotalElement.textContent = `0 / ${state.images.length}`;
+    actions.appendChild(sampleLengthTotalElement);
+    displayImage();
+    document.getElementById('file-name').textContent = state.images[counter];
 });
 
 function setupKeyboardNavigation() {
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowRight') nextImage();
-    else if (event.key === 'ArrowLeft') prevImage();
-    else if (event.key === 'ArrowDown') imageDelete();
-    else if (event.key === 'Delete') deleteFromCanvas();
-  });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'ArrowRight') {
+            nextImage();
+            counter += 1;
+            document.getElementById('file-name').textContent =
+                state.images[counter];
+
+            let name = state.images[counter - 1].split('_')[1];
+            name = name.split('.')[0];
+
+            document.getElementById(name).style.borderColor = 'lightgrey';
+
+            name = state.images[counter].split('_')[1];
+            name = name.split('.')[0];
+            document.getElementById(name).style.borderColor = 'red';
+        } else if (event.key === 'ArrowLeft') {
+            prevImage();
+            counter -= 1;
+            document.getElementById('file-name').textContent =
+                state.images[counter];
+
+            let name = state.images[counter + 1].split('_')[1];
+            name = name.split('.')[0];
+            document.getElementById(name).style.borderColor = 'lightgrey';
+
+            name = state.images[counter].split('_')[1];
+            name = name.split('.')[0];
+            document.getElementById(name).style.borderColor = 'red';
+        }
+    });
 }
 const clothButtons = [];
 let btnBefore = null;
 function addClothTypes() {
-  const clothes = [
-    'jacket',
-    'shirt',
-    't-shirt',
-    'polo',
-    'dress',
-    'pant',
-    'short',
-    'skirt',
-  ];
-  const actions = document.getElementById('actions');
-  const div = document.createElement('div');
-  div.id = 'cloth-types';
+    const clothes = [
+        'dress',
+        'skirt',
+        'sweatshirt',
+        'shirt',
+        'short',
+        'pant',
+        'jacket',
+        'poloshirt',
+        't-shirt',
+    ];
+    const actions = document.getElementById('actions');
+    const div = document.createElement('div');
+    div.id = 'cloth-types';
 
-  clothes.forEach((cloth) => {
-    const button = document.createElement('button');
-    button.textContent = cloth;
-    button.addEventListener('click', () => {
-      if (btnBefore != null) {
-        btnBefore.style.borderColor = 'lightgrey'; // Change to 'lightgrey'
-      }
-      button.style.borderColor = 'red';
-      const rect = canvas.getActiveObject();
-      rect.set({ label: cloth });
-      canvas.renderAll();
-      btnBefore = button;
+    clothes.forEach(cloth => {
+        const button = document.createElement('button');
+        button.textContent = cloth;
+        button.id = cloth;
+        button.addEventListener('click', async () => {
+            if (btnBefore != null) {
+                btnBefore.style.borderColor = 'lightgrey'; // Change to 'lightgrey'
+            }
+            button.style.borderColor = 'red';
+            // const rect = canvas.getActiveObject();
+            //rect.set({ label: cloth });
+
+            let name = state.images[counter];
+
+            let frame = name.split('_')[0];
+
+            let new_name = frame + '_' + cloth + '.jpg';
+
+            document.getElementById('file-name').textContent = new_name;
+
+            canvas.renderAll();
+            btnBefore = button;
+
+            await putImageFileName(name, new_name);
+            state.images[counter] = new_name;
+        });
+        div.appendChild(button);
+        clothButtons.push(button);
     });
-    div.appendChild(button);
-    clothButtons.push(button);
-  });
 
-  actions.appendChild(div);
+    actions.appendChild(div);
 }
 
 canvas.on('mouse:down', function (options) {
-  if (options.target && options.target.type === 'rect') {
-    const rect = options.target;
-    const index = clothButtons.find((btn) => btn.textContent == rect.label);
-    if (index) {
-      if (btnBefore) {
+    if (options.target && options.target.type === 'rect') {
+        const rect = options.target;
+        const index = clothButtons.find(btn => btn.textContent == rect.label);
+        if (index) {
+            if (btnBefore) {
+                btnBefore.style.borderColor = 'lightgrey';
+            }
+            index.style.borderColor = 'red';
+            btnBefore = index;
+        }
+    } else {
         btnBefore.style.borderColor = 'lightgrey';
-      }
-      index.style.borderColor = 'red';
-      btnBefore = index;
     }
-  } else {
-    btnBefore.style.borderColor = 'lightgrey';
-  }
 });
 
 document
-  .getElementById('saveBBoxes')
-  .addEventListener('click', saveBoundingBoxes);
+    .getElementById('saveBBoxes')
+    .addEventListener('click', saveBoundingBoxes);

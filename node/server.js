@@ -10,13 +10,13 @@ app.use(express.json());
 app.use(express.static('public'));
 
 app.use(
-  '/images',
-  express.static(
-    path.join(
-      __dirname,
-      '../dataset/classifier/train/recording_2024-07-05-9_base/'
+    '/images',
+    express.static(
+        path.join(
+            __dirname,
+            '../src/pipeline/output/recording_2024-08-19_True_False_ViT-B-16_v0'
+        )
     )
-  )
 );
 
 app.use(structRoutes);
@@ -24,8 +24,8 @@ app.use(imageRoutes);
 app.use(canvasRoutes);
 
 const server = app.listen(3000, () => {
-  const address = server.address(); // Get the server's address information
-  const host = address.address;
-  const port = address.port;
-  console.log(`Server is running at http://${host}:${port}`);
+    const address = server.address(); // Get the server's address information
+    const host = address.address;
+    const port = address.port;
+    console.log(`Server is running at http://${host}:${port}`);
 });

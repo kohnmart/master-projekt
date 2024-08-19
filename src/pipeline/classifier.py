@@ -6,7 +6,7 @@ import pandas as pd
 from modules.clip import ClipFast
 from modules.cloth_categories import ClothingCategories
 
-from modules.choices import make_choices
+from modules.helper.choices import make_choices
 
 from modules.helper.loader import load_images_from_folder
 from modules.helper.plotting import plot_images, generate_and_plot_conf

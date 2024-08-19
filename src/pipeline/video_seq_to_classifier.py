@@ -5,7 +5,7 @@ import pandas as pd
 
 from modules.yolos import YOLOSDetector
 from modules.clip import ClipFast
-from modules.choices import make_choices
+from modules.helper.choices import make_choices
 
 from modules.helper.loader import load_images_from_folder
 from modules.helper.plotting import plot_images
@@ -78,7 +78,6 @@ while cap.isOpened():
     # Object Detection
     is_detected, cropped_image = yolo_instance.process(frame)
     detection_score = {}
-
     # If an object is detected, run the CLIP classifier
     if is_detected:
         keyed_frame = cropped_image
@@ -91,15 +90,18 @@ while cap.isOpened():
         if frame_count - 3 <= last_detection[1]:
             current_detection_list.append(detection_score)
             last_keyed_frame = keyed_frame
+            is_last_keyed_frame = True
         else:
             last_detection = [detection_score, frame_count]
             current_detection_list.append(detection_score)
+            is_last_keyed_frame = False
 
     # If no object is detected, save the last detection
-    elif not is_detected and last_keyed_frame:
+    elif is_detected == False and is_last_keyed_frame == True:
         avg_total, max_item = calculate_averages(current_detection_list)
         cv2.imwrite(os.path.join(output_dir, f"frame{frame_count}_{max_item}.jpg"), last_keyed_frame)
         last_keyed_frame = []
+        is_last_keyed_frame = False
         current_detection_list = []
 
     frame_count += 1

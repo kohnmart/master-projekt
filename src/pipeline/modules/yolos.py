@@ -1,6 +1,7 @@
 from transformers import YolosForObjectDetection, YolosImageProcessor
 from PIL import Image
-from abstracts.object_detection import ObjectDetector
+import numpy as np
+from modules.abstracts.object_detection import ObjectDetector
 import torch
 
 class YOLOSDetector(ObjectDetector):
@@ -30,7 +31,8 @@ class YOLOSDetector(ObjectDetector):
 
     def _extract_detections(self, results, image_np, width, height):
         """Extracts and processes detections from YOLOS results."""
-        found_objects, scores = []
+        found_objects = []
+        scores = []
 
         for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
             x_min, y_min, x_max, y_max = self._get_bounding_box_coordinates(box, width, height)
