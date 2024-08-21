@@ -9,7 +9,7 @@ let sub_path = '';
 router.get('/images', (req, res) => {
     sub_path = path.join(
         __dirname,
-        `../../src/pipeline/output/recording_2024-08-19_True_False_ViT-B-16_v0`
+        `../../src/pipeline/stream_extracted/recording_2024-08-26_mixed`
     );
     try {
         // Read the contents of the directory
@@ -38,9 +38,6 @@ router.delete('/images/:imageName', (req, res) => {
 router.put('/images/:imageName', (req, res) => {
     const imageName = req.params.imageName;
     const newImageName = req.body.newImageName; // The new name should be provided in the request body
-    console.log('TEST');
-    console.log(imageName);
-    console.log(newImageName);
     const imagePath = path.join(sub_path, imageName);
     const newImagePath = path.join(sub_path, newImageName);
 

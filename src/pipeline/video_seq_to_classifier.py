@@ -55,7 +55,8 @@ distance_per_frame = 1 / frame_rate  # Assuming 1 meter per second speed
 capture_interval = 0.05  # Meters
 frames_to_skip = int(capture_interval / distance_per_frame)
 
-
+# Get the total number of frames in the video
+total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
 ###### HELPER VARIABLES ######
 current_detection_list = []
@@ -66,15 +67,15 @@ last_keyed_frame = []
 
 
 
+is_last_keyed_frame = False
 ###### CAPTURE RUN ######
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
 
-    print(f'\rFrame Count: {frame_count}', end='', flush=True)
+    print(f'\Processing Frame: {frame_count} / {total_frames}', end='', flush=True)
     frame = np.rot90(frame)
-    
     # Object Detection
     is_detected, cropped_image = yolo_instance.process(frame)
     detection_score = {}

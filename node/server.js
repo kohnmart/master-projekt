@@ -14,7 +14,7 @@ app.use(
     express.static(
         path.join(
             __dirname,
-            '../src/pipeline/output/recording_2024-08-19_True_False_ViT-B-16_v0'
+            '../src/pipeline/stream_extracted/recording_2024-08-26_mixed'
         )
     )
 );

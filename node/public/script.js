@@ -4,6 +4,7 @@ import {
     prevImage,
     loadImages,
     state,
+    imageDelete,
 } from './image.js';
 
 import {
@@ -33,8 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadImages();
     sampleLengthTotalElement.textContent = `0 / ${state.images.length}`;
     actions.appendChild(sampleLengthTotalElement);
-    displayImage();
     document.getElementById('file-name').textContent = state.images[counter];
+    displayImage();
 });
 
 function setupKeyboardNavigation() {
@@ -66,11 +67,13 @@ function setupKeyboardNavigation() {
             name = state.images[counter].split('_')[1];
             name = name.split('.')[0];
             document.getElementById(name).style.borderColor = 'red';
+        } else if (event.key === 'Delete') {
+            imageDelete();
         }
     });
 }
 const clothButtons = [];
-let btnBefore = null;
+let btnBeforeId = null;
 function addClothTypes() {
     const clothes = [
         'dress',
@@ -92,11 +95,12 @@ function addClothTypes() {
         button.textContent = cloth;
         button.id = cloth;
         button.addEventListener('click', async () => {
-            if (btnBefore != null) {
-                btnBefore.style.borderColor = 'lightgrey'; // Change to 'lightgrey'
+            if (btnBeforeId != null) {
+                document.getElementById(btnBeforeId).style.borderColor =
+                    'lightgrey'; // Change to 'lightgrey'
             }
             button.style.borderColor = 'red';
-            // const rect = canvas.getActiveObject();
+            //const rect = canvas.getActiveObject();
             //rect.set({ label: cloth });
 
             let name = state.images[counter];
@@ -108,7 +112,7 @@ function addClothTypes() {
             document.getElementById('file-name').textContent = new_name;
 
             canvas.renderAll();
-            btnBefore = button;
+            btnBeforeId = button.id;
 
             await putImageFileName(name, new_name);
             state.images[counter] = new_name;
@@ -120,7 +124,7 @@ function addClothTypes() {
     actions.appendChild(div);
 }
 
-canvas.on('mouse:down', function (options) {
+/*canvas.on('mouse:down', function (options) {
     if (options.target && options.target.type === 'rect') {
         const rect = options.target;
         const index = clothButtons.find(btn => btn.textContent == rect.label);
@@ -134,7 +138,7 @@ canvas.on('mouse:down', function (options) {
     } else {
         btnBefore.style.borderColor = 'lightgrey';
     }
-});
+});*/
 
 document
     .getElementById('saveBBoxes')
