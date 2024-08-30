@@ -74,7 +74,8 @@ while cap.isOpened():
     if not ret:
         break
 
-    print(f'\Processing Frame: {frame_count} / {total_frames}', end='', flush=True)
+    print(f'Frame: {frame_count} / {total_frames}', end='\r', flush=True)
+
     frame = np.rot90(frame)
     # Object Detection
     is_detected, cropped_image = yolo_instance.process(frame)

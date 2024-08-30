@@ -33,21 +33,9 @@ function prevImage() {
     displayImage();
 }
 
-async function imageDelete() {
+async function imageDelete(imageName) {
     try {
-        const imageName = state.images[state.currentIndex];
-        await deleteBboxes(imageName);
         await axios.delete(`/images/${imageName}`);
-        clearCanvas();
-
-        state.images.splice(state.currentIndex, 1);
-        if (state.images.length === 0) {
-            alert('No more images available.');
-            return;
-        }
-
-        state.currentIndex = Math.max(state.currentIndex - 1, 0);
-        displayImage();
         alert('Image deleted successfully!');
     } catch (error) {
         handleError('deleting image', error);

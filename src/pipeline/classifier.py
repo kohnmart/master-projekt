@@ -64,6 +64,7 @@ clip_instance = ClipFast(model_name=choices['clip'])
 
 folder_name = choices['file']
 fullpath = os.path.join(path, folder_name)
+print(fullpath)
 images, filenames = load_images_from_folder(fullpath)
 
 full_path = os.path.join('output', choices['concat_name'])
@@ -85,6 +86,7 @@ for i, keyed_frame in enumerate(images):
     true_labels.append(label)
     detection_score = {}
 
+    keyed_frame = np.rot90(keyed_frame, k=-1)
 
     if choices['decision_tree'] == True:
         detection_score, parent_averages = clip_instance.clip_decision_tree(keyed_frame, choices['rotation'])

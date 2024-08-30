@@ -1,11 +1,10 @@
-
 import clip
 import torch
 
 from PIL import Image
 from transformers import CLIPProcessor, CLIPModel
 
-
+# # from cloth_matrix import all_classes_matrix, high_level_matrix, upperwear_matrix, underwear_matrix
 from modules.cloth_categories import ClothingCategories
 from modules.helper.vision import rotation_image_proper
 
@@ -122,17 +121,26 @@ class ClipFast:
         paired = list(zip(values, indices))
 
         # Sort pairs by the first element (value)
-        sorted_paired = sorted(paired, key=lambda x: x[0], reverse=True)
+        #sorted_paired = sorted(paired, key=lambda x: x[0], reverse=True)
 
-        for value, index in sorted_paired:
+
+        for value, index in paired:
             paired_listing.append([self.classes[index], value.item()])  
-        return paired_listing
+
+        sorted_paired = []
+        for category in self.classes:
+            for pair in paired_listing:
+                if category == pair[0]:
+                    sorted_paired.append(pair)
+
+        return sorted_paired
 
     
 
     def clip_decision_tree(self, keyed_frame, with_rotation):
         max_item_type = ''
         averages = ''
+        upperwear_tree = ''
         self.classes = ClothingCategories.get_high_level_classes()
         if with_rotation == True:
             averages = self.process_on_rotation(keyed_frame, rotation_amount=4)
@@ -141,12 +149,18 @@ class ClipFast:
             averages = self.process_on_rotation(keyed_frame, rotation_amount=1)
             max_item_type = max(averages, key=averages.get)
 
-        upperwear_tree = ClothingCategories.get_upperwear_tree()
-        underwear_tree = ClothingCategories.get_underwear_tree()
+        if max_item_type == 'shirt':
+            self.classes = ClothingCategories.get_long_or_short_sleeve_decision() 
+            averages = self.process_on_rotation(keyed_frame, rotation_amount=1)
+            sub = max(averages, key=averages.get)     
+            if sub == 'long-sleeve':
+                upperwear_tree = ClothingCategories.get_upperwear_tree_long_sleeve()
+            else:
+                upperwear_tree = ClothingCategories.get_upperwear_tree_short_sleeve()
 
         # decision tree
 
-        res = self.subpath(averages, max_item_type, 'pant', underwear_tree, keyed_frame, with_rotation)
+        res = self.subpath(averages, max_item_type, 'pant', ClothingCategories.get_underwear_tree(), keyed_frame, with_rotation)
         updated_clothing_scores = {}
         for item, score in res.items():
             if item == 'short pant':

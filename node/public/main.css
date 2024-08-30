@@ -1,0 +1,125 @@
+/* General styling for body and text */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    color: #333;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 20px;
+    font-size: 2rem;
+    color: #444;
+}
+
+p#file-name {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+/* Styling for the container holding the canvas and actions */
+#container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Styling for the canvas element */
+canvas#c {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+/* Styling for the actions section */
+#actions {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+    column-gap: 1rem;
+    margin-left: 20px;
+}
+
+/* Styling for buttons in the actions section */
+#actions button {
+    padding: 10px;
+    font-size: 1rem;
+    background-color: #828282;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+
+#actions button:hover {
+    background-color: #0056b3;
+}
+
+#cloth-types button {
+    padding: 10px;
+    font-size: 1rem;
+    width: 100px;
+    background-color: #828282;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+
+/* Styling for the image container */
+.image-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Styling for each image item */
+.image-item {
+    margin: 10px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.image-item:hover {
+    border-color: #007bff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #actions {
+        margin-left: 0;
+        margin-top: 20px;
+    }
+
+    canvas#c {
+        width: 100%;
+        height: auto;
+    }
+}

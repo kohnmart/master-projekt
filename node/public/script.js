@@ -27,11 +27,19 @@ document
     .getElementById('addRectangle')
     .addEventListener('click', enableRectangleDrawing);
 
+document
+    .getElementById('deleteMarker')
+    .addEventListener('click', markForDeletion);
+
+document
+    .getElementById('deleteAll')
+    .addEventListener('click', deleteMarkedStorage);
+
 document.addEventListener('DOMContentLoaded', async () => {
-    setupKeyboardNavigation();
     addClothTypes();
     //getFolderStructure();
     await loadImages();
+    setupKeyboardNavigation();
     sampleLengthTotalElement.textContent = `0 / ${state.images.length}`;
     actions.appendChild(sampleLengthTotalElement);
     document.getElementById('file-name').textContent = state.images[counter];
@@ -46,14 +54,13 @@ function setupKeyboardNavigation() {
             document.getElementById('file-name').textContent =
                 state.images[counter];
 
-            let name = state.images[counter - 1].split('_')[1];
-            name = name.split('.')[0];
+            let old_name = state.images[counter - 1].split('_')[1];
+            old_name = old_name.split('.')[0];
+            document.getElementById(old_name).style.borderColor = 'lightgrey';
 
-            document.getElementById(name).style.borderColor = 'lightgrey';
-
-            name = state.images[counter].split('_')[1];
-            name = name.split('.')[0];
-            document.getElementById(name).style.borderColor = 'red';
+            let new_name = state.images[counter].split('_')[1];
+            new_name = new_name.split('.')[0];
+            document.getElementById(new_name).style.borderColor = 'red';
         } else if (event.key === 'ArrowLeft') {
             prevImage();
             counter -= 1;
@@ -139,6 +146,19 @@ function addClothTypes() {
         btnBefore.style.borderColor = 'lightgrey';
     }
 });*/
+
+let delStorage = [];
+
+function markForDeletion() {
+    console.log(state.images[state.currentIndex]);
+    delStorage.push(state.images[state.currentIndex]);
+}
+
+function deleteMarkedStorage() {
+    delStorage.forEach(imageName => {
+        imageDelete(imageName);
+    });
+}
 
 document
     .getElementById('saveBBoxes')

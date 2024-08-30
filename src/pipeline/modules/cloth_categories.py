@@ -3,15 +3,6 @@ class ClothingCategories:
     A class for managing and retrieving clothing classifications and their hierarchical structure.
     --> only semantic class.
     """
-
-    @staticmethod
-    def get_high_level_classes() -> list:
-        """
-        Retrieves the high-level clothing classes.
-        ['dress', 'shirt', 'pant']
-        """
-        return ['dress', 'shirt', 'pant']
-
     @staticmethod
     def get_all_classes() -> list:
         """
@@ -21,12 +12,38 @@ class ClothingCategories:
         return ['dress', 'skirt', 'sweatshirt', 'shirt', 'short', 'pant', 'jacket', 'poloshirt', 't-shirt']
 
     @staticmethod
-    def get_upperwear_tree() -> list:
+    def get_high_level_classes() -> list:
+        """
+        Retrieves the high-level clothing classes.
+        ['dress', 'shirt', 'pant']
+        """
+        return ['dress', 'shirt', 'pant', 'jacket']
+
+
+    @staticmethod
+    def get_upperwear_tree_long_sleeve() -> list:
         """
         Retrieves the upperwear clothing classes.
-        ['shirt', 'sweatshirt', 'poloshirt', 't-shirt']
+        ['shirt', 'sweatshirt','jacket']
         """
-        return ['shirt', 'sweatshirt', 'poloshirt', 't-shirt']
+        return ['shirt', 'sweatshirt']
+
+    @staticmethod
+    def get_upperwear_tree_short_sleeve() -> list:
+        """
+        Retrieves the upperwear clothing classes.
+        ['poloshirt', 't-shirt']
+        """
+        return ['poloshirt', 't-shirt']
+
+
+    @staticmethod
+    def get_long_or_short_sleeve_decision() -> list:
+        """
+        Retrieves the upperwear clothing classes.
+        ['long-sleeve', 'short-sleeve']
+        """
+        return ['long-sleeve', 'short-sleeve']
 
     @staticmethod
     def get_underwear_tree() -> list:
@@ -34,4 +51,4 @@ class ClothingCategories:
         Retrieves the underwear clothing classes.
         ['long pant', 'short pant', 'skirt']
         """
-        return ['long pant', 'short pant', 'skirt']
+        return ['pant', 'short', 'skirt']
