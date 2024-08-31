@@ -5,8 +5,8 @@ from PIL import Image
 from transformers import CLIPProcessor, CLIPModel
 
 # # from cloth_matrix import all_classes_matrix, high_level_matrix, upperwear_matrix, underwear_matrix
-from modules.cloth_categories import ClothingCategories
-from modules.helper.vision import rotation_image_proper
+# from modules.cloth_categories import ClothingCategories
+# from modules.helper.vision import rotation_image_proper
 
 
 class ClipFast: 

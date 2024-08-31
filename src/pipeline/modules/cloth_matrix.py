@@ -16,9 +16,10 @@ class ClothingSimilarity:
     ])
 
     high_level_matrix = np.array([
-        [1.0, 0.3, 0.2],  # Dress
-        [0.5, 1.0, 0.4],  # Shirt
-        [0.4, 0.4, 1.0]   # Pant
+        [1.0, 0.3, 0.2, 0.2],  # Dress
+        [0.5, 1.0, 0.4, 0.6],  # Shirt
+        [0.4, 0.4, 1.0, 0.3],  # Pant
+        [0.1, 0.5, 0.1, 1.0]   # Jacket
     ])
 
     upperwear_matrix = np.array([
