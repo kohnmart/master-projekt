@@ -5,8 +5,8 @@ from PIL import Image
 from transformers import CLIPProcessor, CLIPModel
 
 # # from cloth_matrix import all_classes_matrix, high_level_matrix, upperwear_matrix, underwear_matrix
-# from modules.cloth_categories import ClothingCategories
-# from modules.helper.vision import rotation_image_proper
+from modules.cloth_categories import ClothingCategories
+from modules.helper.vision import rotation_image_proper
 
 
 class ClipFast: 
@@ -161,16 +161,6 @@ class ClipFast:
         # decision tree
 
         res = self.subpath(averages, max_item_type, 'pant', ClothingCategories.get_underwear_tree(), keyed_frame, with_rotation)
-        updated_clothing_scores = {}
-        for item, score in res.items():
-            if item == 'short pant':
-                updated_clothing_scores['short'] = score
-            elif item == 'long pant':
-                updated_clothing_scores['pant'] = score
-            else:
-                updated_clothing_scores[item] = score
-
-        res = updated_clothing_scores
 
         res = self.subpath(res, max_item_type, 'shirt', upperwear_tree, keyed_frame, with_rotation)
 
@@ -186,7 +176,6 @@ class ClipFast:
 
 
 
-    
     def subpath(self, res, max_item_type, parentClass, childs, keyed_frame, with_rotation):
         if max_item_type == parentClass:
             self.classes = childs
