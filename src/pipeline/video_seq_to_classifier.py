@@ -76,7 +76,7 @@ while cap.isOpened():
 
     print(f'Frame: {frame_count} / {total_frames}', end='\r', flush=True)
 
-    frame = np.rot90(frame)
+    #frame = np.rot90(frame)
     # Object Detection
     is_detected, cropped_image = yolo_instance.process(frame)
     detection_score = {}

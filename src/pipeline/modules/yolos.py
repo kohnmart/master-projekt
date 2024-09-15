@@ -38,7 +38,7 @@ class YOLOSDetector(ObjectDetector):
             x_min, y_min, x_max, y_max = self._get_bounding_box_coordinates(box, width, height)
             cropped_image = image_np[y_min:y_max, x_min:x_max]
 
-            if self._is_valid_detection(x_min, cropped_image):
+            if self._is_valid_detection(y_min, cropped_image):
                 found_objects.append(cropped_image)
                 scores.append(score.item())
 
@@ -51,6 +51,6 @@ class YOLOSDetector(ObjectDetector):
         x_max, y_max = min(width, x_max), min(height, y_max)
         return x_min, y_min, x_max, y_max
 
-    def _is_valid_detection(self, x_min, cropped_image):
+    def _is_valid_detection(self, min, cropped_image):
         """Checks if a YOLOS detection is valid based on given criteria."""
-        return 50 <= x_min <= 300 and cropped_image.size >= 60000
+        return 50 <= min <= 300 and cropped_image.size >= 60000

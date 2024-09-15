@@ -96,6 +96,9 @@ for i, keyed_frame in enumerate(images):
 
     
     max_item = max(detection_score, key=detection_score.get) 
+
+    max_item = ClothingCategories.decide_on_underwear_tree(max_item)
+
     predicted_labels.append(max_item)
     cv2.imwrite(f"{full_path}/{filename}_{max_item}_.jpg", keyed_frame)
 

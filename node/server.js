@@ -14,7 +14,7 @@ app.use(
     express.static(
         path.join(
             __dirname,
-            '../src/pipeline/stream_extracted/mixed-stage-1-all'
+            '../src/pipeline/stream_extracted/mixed-stage-3-all'
         )
     )
 );

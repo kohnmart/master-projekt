@@ -51,4 +51,15 @@ class ClothingCategories:
         Retrieves the underwear clothing classes.
         ['long pant', 'short pant', 'skirt']
         """
-        return ['pant', 'short', 'skirt']
+        return ['jeans', 'trouser', 'sweatpant', 'pant', 'hot pant', 'bermuda short', 'training short', 'skirt']
+
+
+    @staticmethod
+    def decide_on_underwear_tree(item) -> str:
+        if item in ['hot pant', 'bermuda short', 'training short']:
+            return 'short'
+        
+        elif item in ['jeans', 'trouser', 'sweatpant']:
+            return 'pant'
+        else: 
+            return item

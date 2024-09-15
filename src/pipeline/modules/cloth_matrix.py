@@ -30,8 +30,8 @@ class ClothingSimilarity:
     ])
 
     underwear_matrix = np.array([
-        [1.0, 0.7, 0.2],  # Long Pant
-        [0.7, 1.0, 0.7],  # Short Pant
+        [1.0, 0.7, 0.2],  # Pant
+        [0.2, 1.0, 0.7],  # Short
         [0.2, 0.7, 1.0]   # Skirt
     ])
 
