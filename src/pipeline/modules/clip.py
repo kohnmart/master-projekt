@@ -158,11 +158,15 @@ class ClipFast:
             else:
                 upperwear_tree = ClothingCategories.get_upperwear_tree_short_sleeve()
 
+            res = self.subpath(averages, max_item_type, 'shirt', upperwear_tree, keyed_frame, with_rotation)
+            return res, averages
+
+        elif max_item_type == 'jacket':
+            res = self.subpath(averages, max_item_type, 'jacket', ['sweatshirt', 'jacket'], keyed_frame, with_rotation)
+            return res, averages
         # decision tree
 
-        res = self.subpath(averages, max_item_type, 'pant', ClothingCategories.get_underwear_tree(), keyed_frame, with_rotation)
-
-        res = self.subpath(res, max_item_type, 'shirt', upperwear_tree, keyed_frame, with_rotation)
+        res = self.subpath(averages, max_item_type, 'pant', ClothingCategories.get_underwear_tree(), keyed_frame, False)
 
         return res, averages
 
