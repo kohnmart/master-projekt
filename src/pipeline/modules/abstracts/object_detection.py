@@ -21,3 +21,15 @@ class ObjectDetector(ABC):
 
         best_index = int(np.argmax(scores))
         return True, found_objects[best_index] if found_objects else []
+
+
+    def _get_largest_cropped_image(self, found_objects):
+        """Returns the detection with the largest cropped image area."""
+        if not found_objects or len(found_objects) == 0:
+            return False, []
+
+        # Calculate the area for each cropped image (height * width)
+        areas = [img.shape[0] * img.shape[1] for img in found_objects]  # shape[0] is height, shape[1] is width
+        largest_index = int(np.argmax(areas))
+
+        return True, found_objects[largest_index]

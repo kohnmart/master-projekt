@@ -1,16 +1,21 @@
-import os 
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '../../')))
+sys_path = sys.path[-1]
+
 import cv2
 import numpy as np
 import pandas as pd
 
-from modules.clip import ClipFast
-from modules.cloth_categories import ClothingCategories
+from src.pipeline.modules.clip import ClipFast
+from src.pipeline.modules.cloth_categories import ClothingCategories
 
-from modules.helper.choices import make_choices
+from src.pipeline.modules.helper.choices import make_choices
 
-from modules.helper.loader import load_images_from_folder
-from modules.helper.plotting import plot_images, generate_and_plot_conf
-from modules.helper.calc import calculate_averages
+from src.pipeline.modules.helper.loader import load_images_from_folder
+from src.pipeline.modules.helper.plotting import plot_images, generate_and_plot_conf
+from src.pipeline.modules.helper.calc import calculate_averages
 
 
 """
@@ -52,8 +57,9 @@ located in the specified folder and that the necessary modules are available.
 
 
 ###### CHOICES CONFIGURATION ######
-path = './stream_extracted'
-choices = make_choices(path)
+dataset_production_dir = "dataset/production/setup-v2"
+data_path = os.path.join(sys_path, dataset_production_dir)
+choices = make_choices(data_path, True)
 
 
 ###### SETUP ######
@@ -63,10 +69,12 @@ print('Launching...')
 clip_instance = ClipFast(model_name=choices['clip'])
 
 folder_name = choices['file']
-fullpath = os.path.join(path, folder_name)
+fullpath = os.path.join(data_path, folder_name)
 print(fullpath)
 images, filenames = load_images_from_folder(fullpath)
 
+
+export_path = os.path.join(sys_path, "src/pipeline/output")
 full_path = os.path.join('output', choices['concat_name'])
 if not os.path.exists(full_path):
     os.mkdir(full_path)
@@ -84,37 +92,37 @@ for i, keyed_frame in enumerate(images):
     filename = filenames[i].split('.')[0]
     label = filename.split('_')[1]
     true_labels.append(label)
-    detection_score = {}
-
-    keyed_frame = np.rot90(keyed_frame, k=-1)
+    final_score = {}
 
     if choices['decision_tree'] == True:
-        detection_score, parent_averages = clip_instance.clip_decision_tree(keyed_frame, choices['rotation'])
+        final_score, parent_score = clip_instance.clip_decision_tree(keyed_frame, choices['rotation'])
 
     else:
-        detection_score = clip_instance.clip_decision_plain(keyed_frame, choices['rotation'])
+        final_score = clip_instance.clip_decision_plain(keyed_frame, choices['rotation'])
 
     
-    max_item = max(detection_score, key=detection_score.get) 
+    max_item = max(final_score, key=final_score.get) 
 
     max_item = ClothingCategories.decide_on_underwear_tree(max_item)
+
+    max_item = ClothingCategories.decide_on_upperwear_tree(max_item)
 
     predicted_labels.append(max_item)
     cv2.imwrite(f"{full_path}/{filename}_{max_item}_.jpg", keyed_frame)
 
     if choices['decision_tree'] == True:
         # Convert original data to DataFrame
-        df_data = pd.DataFrame([parent_averages], index=['parent-tree-avg'])
+        df_parent = pd.DataFrame([parent_score], index=['parent-tree-avg'])
 
         # Convert averages to DataFrame
-        df_averages = pd.DataFrame([detection_score], index=['sub-tree-avg'])
+        df_final = pd.DataFrame([final_score], index=['final-tree-avg'])
 
         # Concatenate the two DataFrames
-        df_combined = pd.concat([df_data, df_averages])
+        df_combined = pd.concat([df_parent, df_final])
 
     else:
         # Convert averages to DataFrame
-        df_combined = pd.DataFrame([detection_score], index=['plain-avg'])
+        df_combined = pd.DataFrame([final_score], index=['plain-avg'])
 
     # Save the combined DataFrame to CSV
     csv_file = f"{full_path}/{filename}_{max_item}__.csv"

@@ -27,7 +27,7 @@ class YOLOSDetector(ObjectDetector):
         results = self.image_processor.post_process_object_detection(outputs, threshold=0.2, target_sizes=target_sizes)[0]
 
         found_objects, scores = self._extract_detections(results, image_np, width, height)
-        return self._get_best_detection(found_objects, scores)
+        return self._get_largest_cropped_image(found_objects)
 
     def _extract_detections(self, results, image_np, width, height):
         """Extracts and processes detections from YOLOS results."""
@@ -38,7 +38,7 @@ class YOLOSDetector(ObjectDetector):
             x_min, y_min, x_max, y_max = self._get_bounding_box_coordinates(box, width, height)
             cropped_image = image_np[y_min:y_max, x_min:x_max]
 
-            if self._is_valid_detection(y_min, cropped_image):
+            if self._is_valid_detection(x_min, cropped_image):
                 found_objects.append(cropped_image)
                 scores.append(score.item())
 

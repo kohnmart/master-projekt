@@ -26,9 +26,9 @@ def find_highest_version(files, base_name):
 
     return highest_version
 
-def make_choices(path):
+def make_choices(path, get_extractions):
     # List files in the stream video directory
-    if path == './stream_extracted':
+    if get_extractions:
         file_choices = list_subdirectories(path)
     
     else:

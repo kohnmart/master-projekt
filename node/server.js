@@ -12,10 +12,7 @@ app.use(express.static('public'));
 app.use(
     '/images',
     express.static(
-        path.join(
-            __dirname,
-            '../src/pipeline/stream_extracted/mixed-stage-2-all'
-        )
+        path.join(__dirname, '../dataset/production/setup-v2/jacket-stage-1')
     )
 );
 

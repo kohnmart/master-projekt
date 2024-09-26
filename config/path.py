@@ -26,9 +26,9 @@ def get_checkpoint_path(name=None):
         checkpoint_path = os.path.join(checkpoint_path, name)
     return checkpoint_path
 
-def get_training_data_path(data_type=None, file_name=None, class_type=None):
+def get_training_data_path(setup_v=None, data_type=None, file_name=None, class_type=None):
     """Return the path to the directory containing training data."""
-    train_path = os.path.join(get_project_root(), f"dataset/{data_type}/train")
+    train_path = os.path.join(get_project_root(), f"dataset/production/{setup_v}/{data_type}")
 
     if class_type:
         train_path = os.path.join(train_path, class_type)

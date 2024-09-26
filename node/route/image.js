@@ -9,7 +9,7 @@ let sub_path = '';
 router.get('/images', (req, res) => {
     sub_path = path.join(
         __dirname,
-        `../../src/pipeline/stream_extracted/mixed-stage-2-all`
+        '../../dataset/production/setup-v2/jacket-stage-1'
     );
     try {
         // Read the contents of the directory

@@ -1,15 +1,23 @@
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '../../')))
+sys_path = sys.path[-1]
+
+
 import cv2
 import numpy as np
 import os 
 import pandas as pd
 
-from modules.yolos import YOLOSDetector
-from modules.clip import ClipFast
-from modules.helper.choices import make_choices
+from src.pipeline.modules.yolos import YOLOSDetector
+from src.pipeline.modules.clip import ClipFast
+from src.pipeline.modules.cloth_categories import ClothingCategories
+from src.pipeline.modules.helper.choices import make_choices
 
-from modules.helper.loader import load_images_from_folder
-from modules.helper.plotting import plot_images
-from modules.helper.calc import calculate_averages
+from src.pipeline.modules.helper.loader import load_images_from_folder
+from src.pipeline.modules.helper.plotting import plot_images
+from src.pipeline.modules.helper.calc import calculate_averages
 
 
 """
@@ -26,7 +34,7 @@ Usage:
 """
 
 ###### CHOICES CONFIGURATION ######
-choices = make_choices(path='./stream_video')
+choices = make_choices(path='./stream_video', get_extractions=False)
 
 
 
@@ -76,7 +84,7 @@ while cap.isOpened():
 
     print(f'Frame: {frame_count} / {total_frames}', end='\r', flush=True)
 
-    #frame = np.rot90(frame)
+    frame = np.rot90(frame)
     # Object Detection
     is_detected, cropped_image = yolo_instance.process(frame)
     detection_score = {}
