@@ -172,13 +172,12 @@ class ClipFast:
 
 
 
-    def subpath(self, max_item_type, parentClass, childs, keyed_frame, with_rotation):
-        if max_item_type == parentClass:
-            self.classes = childs
-            if with_rotation == True:
-                return self.process_on_rotation(keyed_frame, rotation_amount=4)
-            else:
-                return self.process_on_rotation(keyed_frame, rotation_amount=1)
+    def subpath(self, childs, keyed_frame, with_rotation):
+        self.classes = childs
+        if with_rotation == True:
+            return self.process_on_rotation(keyed_frame, rotation_amount=4)
+        else:
+            return self.process_on_rotation(keyed_frame, rotation_amount=1)
 
     
 
@@ -186,10 +185,10 @@ class ClipFast:
         self.classes = ClothingCategories.get_high_level_classes()
         if with_rotation == True:
             main_path_score = self.process_on_rotation(keyed_frame, rotation_amount=4)
-            main_item_type = max(main_path_score, key=main_path_score.get)
+            main_item_type = self.get_max_score(main_path_score)
         else:
             main_path_score = self.process_on_rotation(keyed_frame, rotation_amount=1)
-            main_item_type = max(main_path_score, key=main_path_score.get)
+            main_item_type =  self.get_max_score(main_path_score)
 
         return main_item_type, main_path_score
 
@@ -197,17 +196,24 @@ class ClipFast:
     def sub_branch_shirt(self, max_item_type, keyed_frame, with_rotation):
         if max_item_type == 'shirt':
             classes = ClothingCategories.get_shirt_classes()
-            res = self.subpath(max_item_type, 'shirt', classes, keyed_frame, with_rotation)
-            max_item_type = max(res, key=res.get)
+            res_shirt = self.subpath(classes, keyed_frame, with_rotation)
+            res_shirt_item = self.get_max_score(res_shirt)
+
 
             ## CHECK ON POLOSHIRTS 
             if max_item_type == 'poloshirt':
                 classes = ['longsleeve', 'shortsleeve']
-                sub_res_poloshirt = self.subpath(max_item_type, 'poloshirt', classes, keyed_frame, with_rotation)
+                sub_res_poloshirt_item = self.subpath(classes, keyed_frame, with_rotation)
                 # Fix: Use correct parameters and pass sub_res_poloshirt only as a dict
-                res = ClothingCategories.swap_out_temp_categories(res, sub_res_poloshirt, current_type='longsleeve', type_to_insert='sweatshirt', type_to_pop='poloshirt')
+                sub_res_poloshirt_item = ClothingCategories.swap_out_temp_categories(sub_res_poloshirt_item, sub_res_poloshirt_item, current_type='longsleeve', type_to_insert='sweatshirt', type_to_pop='poloshirt')
 
-            return res
+                final_score = self.get_max_score(sub_res_poloshirt_item)
+
+                return { 'final_item': sub_res_poloshirt_item, 'score_tree': [res_shirt, sub_res_poloshirt_item]}
+            
+            res_shirt_item = ClothingCategories.decide_on_upperwear_tree(res_shirt_item)
+            
+            return { 'final_item': res_shirt_item, 'score_tree': [res_shirt]}
 
         else:
             return False
@@ -219,17 +225,19 @@ class ClipFast:
             skirts = ClothingCategories.get_semantics('skirt')
             dresses = ClothingCategories.get_semantics('dress')
             combined = skirts + dresses 
-            res = self.subpath(max_item_type, 'dress', combined, keyed_frame, with_rotation)  
+            res_dress = self.subpath(combined, keyed_frame, with_rotation)  
 
-            max_type = max(res, key=res.get)
+            max_type = self.get_max_score(res_dress)
 
             if max_type in skirts:
-                res['skirt'] = res.pop(max_type, 0)
+                res_dress['skirt'] = res_dress.pop(max_type, 0)
 
             else:
-                res['dress'] = res.pop(max_type, 0)
+                res_dress['dress'] = res_dress.pop(max_type, 0)
 
-            return res
+            res_dress_item = self.get_max_score(res_dress)
+
+            return { 'final_item': res_dress_item, 'score_tree': [res_dress]}
 
         else:
             return False
@@ -238,8 +246,9 @@ class ClipFast:
     def sub_branch_jacket(self, max_item_type, keyed_frame, with_rotation):
         if max_item_type == 'jacket':
             classes = ['sweatshirt', 'jacket']
-            res = self.subpath(max_item_type, 'jacket', classes , keyed_frame, with_rotation)
-            return res
+            res_jacket = self.subpath(classes , keyed_frame, with_rotation)
+            res_jacket_item = self.get_max_score(res_jacket)
+            return { 'final_item': res_jacket_item, 'score_tree': [res_jacket]}
 
         else: 
             return False
@@ -247,21 +256,28 @@ class ClipFast:
     
     def sub_branch_pant(self, max_item_type, keyed_frame, with_rotation):
         if max_item_type == 'pant':
-            res = self.subpath(max_item_type, 'pant', ClothingCategories.get_underwear_tree(), keyed_frame, with_rotation)
-            max_type = max(res, key=res.get)
+            res_pant = self.subpath(ClothingCategories.get_underwear_tree(), keyed_frame, with_rotation)
+            
+            res_pant_item = self.get_max_score(res_pant)
+            res_pant_item = ClothingCategories.decide_on_underwear_tree(res_pant_item)
 
             ## CHECK ON SHORTS
-            if max_type in ['hot pant', 'training short']:
-                if max_type == 'hot pant':
-                    res = ClothingCategories.swap_out_temp_categories(res, res, current_type='hot pant', type_to_insert='short', type_to_pop='hot pant')
-                else:
-                    res = ClothingCategories.swap_out_temp_categories(res, res, current_type='training short', type_to_insert='short', type_to_pop='training short')
-                max_type = 'short'
+            if res_pant_item == 'short':
+                sub_res_short = self.subpath(['short', 'skirt'], keyed_frame, with_rotation)
 
-                sub_res_short = self.subpath(max_type, 'short', ['short', 'skirt'], keyed_frame, with_rotation)
-                res = ClothingCategories.swap_out_temp_categories(res, sub_res_short, current_type='skirt', type_to_insert='skirt', type_to_pop='short')
+                sub_res_short_item = max(sub_res_short, key=sub_res_short.get)
+                return { 'final_item': sub_res_short_item, 'score_tree': [res_pant, sub_res_short]}
 
-            return res
+            else: 
+                res_pant_item = ClothingCategories.decide_on_underwear_tree(res_pant_item)
+                return { 'final_item': res_pant_item, 'score_tree': [res_pant]}
+        
+
 
         else: 
             return False
+
+
+
+    def get_max_score(self, score: int) -> int:
+        return max(score, key=score.get)
