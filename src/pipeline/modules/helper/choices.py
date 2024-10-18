@@ -78,7 +78,7 @@ def make_choices(path, get_extractions):
     seq_entry_answer = inquirer.prompt(seq_entry_question)
 
     # List files in the output directory
-    outputs_list = list_subdirectories('./output')
+    outputs_list = list_subdirectories('../output')
     concat_output_name = f"{file_answer['file_choice'].split('.')[0]}_{decision_tree_answer['tree_choice']}_{rotation_answer['rotation_choice']}_{clip}_v"
 
     # Find the highest version of files matching the pattern

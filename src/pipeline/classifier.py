@@ -36,8 +36,8 @@ print(fullpath)
 images, filenames = load_images_from_folder(fullpath)
 
 
-export_path = os.path.join(sys_path, "src/pipeline/output")
-full_path = os.path.join('output', choices['concat_name'])
+export_path = os.path.join(sys_path, "src/output")
+full_path = os.path.join(export_path, choices['concat_name'])
 if not os.path.exists(full_path):
     os.mkdir(full_path)
 
@@ -94,11 +94,11 @@ for i, keyed_frame in enumerate(images):
     df_total.to_csv(csv_file)
 
 
-###### SAVE OUT PLOT ######
+##### SAVE OUT PLOT ######
 
 print("Creating plot...")
 export_path = full_path
-images, filenames = load_images_from_folder(export_path)
+images, filenames = load_images_from_folder(folder=export_path, load_only_false_samples=True)
 
 plot_images(images, filenames, full_path)
 print("Plot saved...")
