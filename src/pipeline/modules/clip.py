@@ -149,11 +149,10 @@ class ClipFast:
             return dress_res, main_scores
 
 
-        if main_item_type == "jacket or shirt":
+        if main_item_type == "tshirt or shirt or jacket":
             
             classes = ["jacket", "shirt"]
-            sub_res_shirt = self.subpath(classes, keyed_frame, with_rotation)
-            max_shirt = self.get_max_score(sub_res_shirt)
+            max_shirt, sub_res_shirt = self.subpath(classes, keyed_frame, with_rotation)
             ## SHIRT CLASSES ## 
             shirt_res = self.sub_branch_shirt(max_shirt, keyed_frame, with_rotation)
             if shirt_res != False: 
@@ -171,21 +170,26 @@ class ClipFast:
 
 
     def clip_decision_plain(self, keyed_frame, with_rotation):
-        self.classes = ClothingCategories.get_all_classes()
-        if with_rotation == True:
-            return self.process_on_rotation(keyed_frame, rotation_amount=4)
-        else:
-            return self.process_on_rotation(keyed_frame, rotation_amount=1)
+        all_classes = ClothingCategories.get_all_classes()
+        skirts = ClothingCategories.get_semantics('skirt')
+        dresses = ClothingCategories.get_semantics('dress')
+        combined = ['dress', 'skirt', 'short', 'pant', 'jacket', 'sweatshirt', 'shirt', 'poloshirt', 't-shirt']
+        max_item, res_items = self.subpath(combined, keyed_frame, with_rotation)
+
+        return { 'final_item': max_item, 'score_tree': res_items}, res_items
 
 
 
     def subpath(self, childs, keyed_frame, with_rotation):
         self.classes = childs
         if with_rotation == True:
-            return self.process_on_rotation(keyed_frame, rotation_amount=4)
+            predictions_result = self.process_on_rotation(keyed_frame, rotation_amount=4)
+            predictions_max_score = self.get_max_score(predictions_result)
+            return predictions_max_score, predictions_result
         else:
-            return self.process_on_rotation(keyed_frame, rotation_amount=1)
-
+            predictions_result = self.process_on_rotation(keyed_frame, rotation_amount=1)
+            predictions_max_score = self.get_max_score(predictions_result)
+            return predictions_max_score, predictions_result
     
 
     def main_path(self, keyed_frame, with_rotation):
@@ -200,23 +204,25 @@ class ClipFast:
         return main_item_type, main_path_score
 
     
+
     def sub_branch_shirt(self, max_item_type, keyed_frame, with_rotation):
         if max_item_type == 'shirt':
             classes = ClothingCategories.get_shirt_classes()
-            res_shirt = self.subpath(classes, keyed_frame, with_rotation)
-            res_shirt_item = self.get_max_score(res_shirt)
+            res_shirt_item, res_shirt = self.subpath(classes, keyed_frame, with_rotation)
 
             res_shirt_item = ClothingCategories.reverse_shirt_classes(res_shirt_item)
 
             ## CHECK ON POLOSHIRTS 
-            if res_shirt_item == 'sweatshirt':
-                classes = ['longsleeve', 'shortsleeve']
-                sub_res_poloshirt = self.subpath(classes, keyed_frame, with_rotation)
+            if res_shirt_item == 'sweatshirt' or res_shirt_item == 'shirt':
+                classes = ['longsleeve shirt', 'shortsleeve shirt']
+                sub_res_score, sub_res_poloshirt = self.subpath(classes, keyed_frame, with_rotation)
                 
-                if self.get_max_score(sub_res_poloshirt) == 'shortsleeve':
+                if sub_res_score == 'shortsleeve':
 
                     return { 'final_item': 'poloshirt', 'score_tree': [res_shirt, sub_res_poloshirt]}
             
+                else:
+                    return { 'final_item': res_shirt_item, 'score_tree': [res_shirt, sub_res_poloshirt]}
             
             return { 'final_item': res_shirt_item, 'score_tree': [res_shirt]}
 
@@ -229,11 +235,8 @@ class ClipFast:
         if max_item_type == 'dress or skirt':
             skirts = ClothingCategories.get_semantics('skirt')
             dresses = ClothingCategories.get_semantics('dress')
-            combined = ['a-line dress', 'dress', 'mini skirt', 'long dress']
-
-            res_dress = self.subpath(combined, keyed_frame, with_rotation)  
-
-            max_type = self.get_max_score(res_dress)
+            combined = skirts + dresses
+            max_type, res_dress = self.subpath(combined, keyed_frame, with_rotation)  
 
             if max_type == "mini skirt":
                 max_type = "skirt"
@@ -249,8 +252,7 @@ class ClipFast:
     def sub_branch_jacket(self, max_item_type, keyed_frame, with_rotation):
         if max_item_type == 'jacket':
             classes = ['sweatshirt', 'jacket']
-            res_jacket = self.subpath(classes , keyed_frame, with_rotation)
-            res_jacket_item = self.get_max_score(res_jacket)
+            res_jacket_item, res_jacket = self.subpath(classes , keyed_frame, with_rotation)
             return { 'final_item': res_jacket_item, 'score_tree': [res_jacket]}
 
         else: 
@@ -259,16 +261,13 @@ class ClipFast:
     
     def sub_branch_pant(self, max_item_type, keyed_frame, with_rotation):
         if max_item_type == 'pant or short':
-            res_pant = self.subpath(ClothingCategories.get_underwear_tree(), keyed_frame, with_rotation)
-            
-            res_pant_item = self.get_max_score(res_pant)
+            res_pant_item, res_pant = self.subpath(ClothingCategories.get_underwear_tree(), keyed_frame, with_rotation)
+        
             res_pant_item = ClothingCategories.decide_on_underwear_tree(res_pant_item)
 
             ## CHECK ON SHORTS
             if res_pant_item == 'short':
-                sub_res_short = self.subpath(['short', 'mini skirt', 'hot pant'], keyed_frame, with_rotation)
-
-                sub_res_short_item = max(sub_res_short, key=sub_res_short.get)
+                sub_res_short_item, sub_res_short = self.subpath(['short', 'mini skirt', 'hot pant'], keyed_frame, with_rotation)
 
                 if sub_res_short_item == 'short' or sub_res_short_item == 'hot pant':
                     sub_res_short_item = "short"

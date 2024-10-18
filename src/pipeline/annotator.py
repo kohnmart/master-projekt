@@ -6,14 +6,25 @@ from clip import ClipClassifier
 import numpy as np
 
 
-#   PRE ANNOTATOR
-#   This script features pre annotations with SAM and CLIP
-#   Saving into MongoDB
-#   Use Node.js ENV for interaction
+"""
+Automated Clothing Sample Processing Pipeline.
 
-#   run - python annotator.py
-#   follow choices
+This script launches and sets up instances of SAM (Segment Anything Model), ClipClassifier, and MONGO
+to process clothing samples for object detection and classification. The script performs the following tasks:
+- Loads all sample file names.
+- For each sample, generates segmentation masks using SAM, cleans the masks, and extracts individual clothing objects.
+- Uses the ClipClassifier to classify each detected clothing object and predict labels with probabilities.
+- Inserts the detected object information and labels into a MongoDB database.
+- Optionally saves the image with bounding boxes around the detected objects.
 
+Key Workflow:
+1. SAM is used to process and segment the input images.
+2. Masks are cleaned and bounding boxes are extracted to isolate individual objects.
+3. ClipClassifier is applied to classify the cropped objects.
+4. The results (labels and masks) are stored in the MongoDB database.
+
+The script tracks and outputs the elapsed time at the end of execution for performance monitoring.
+"""
 
 print('Launching...')
 

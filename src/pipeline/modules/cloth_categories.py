@@ -1,8 +1,8 @@
 class ClothingCategories:
     """
     A class for managing and retrieving clothing classifications and their hierarchical structure.
-    --> only semantic class.
     """
+
     @staticmethod
     def get_all_classes() -> list:
         """
@@ -15,124 +15,141 @@ class ClothingCategories:
     def get_high_level_classes() -> list:
         """
         Retrieves the high-level clothing classes.
-        ['dress', 'shirt', 'pant']
+        ['dress', 'skirt', 'shirt', 'pant', 'jacket']
         """
         return ['dress', 'skirt', 'shirt', 'pant', 'jacket']
     
     @staticmethod 
     def get_high_level_questioning() -> list:
-        return ['dress or skirt', 'jacket or shirt', 'pant or short']
+        """
+        Retrieves possible high-level decision questions for clothing classification.
+        """
+        return ['dress or skirt', 'tshirt or shirt or jacket', 'pant or short']
 
     @staticmethod
     def get_shirt_classes() -> list:
-        return ["T-Shirt", "Polo Shirt", "Henley Shirt",  "Baseball Shirt",
-                "Button-Down Shirt",
-                "Chambray Shirt",
-                "Oxford Shirt",
-                "Camp Shirt",
-                "Tank Top",
-                "Hoodie",
-                "Crewneck Sweatshirt",
-                "Zip-Up Sweatshirt",
-                "Pullover Sweatshirt"
-                ]
+        """
+        Retrieves detailed shirt-related classifications.
+        """
+        return [
+            "T-Shirt", "Polo Shirt", "Baseball Shirt", "Button-Down Shirt",
+            "Chambray Shirt", "Oxford Shirt", "Camp Shirt", "Tank Top",
+            "Hoodie", "Crewneck Sweatshirt", "Zip-Up Sweatshirt", "Pullover Sweatshirt"
+        ]
 
     @staticmethod
     def reverse_shirt_classes(item: str) -> str:
-
-        if item in ["Dress Shirt", "Henley Shirt", "Flannel Shirt", "Button-Down Shirt", "Chambray Shirt", "Oxford Shirt", "Camp Shirt"]:
-            return "shirt"
-        elif item in ["Hoodie", "Baseball Shirt",
-                      "Crewneck Sweatshirt",
-                      "Zip-Up Sweatshirt",
-                      "Pullover Sweatshirt"]:
-            return "sweatshirt"
-        
-        elif item == "Polo Shirt":
-            return "poloshirt"
-        
-        elif item == "T-Shirt" or item == "Tank Top": 
-            return "t-shirt"
-
-
-    @staticmethod
-    def decide_on_upperwear_tree(item) -> str:
-        if item in [
-                "baseballshirt"]:
-            return "sweatshirt"
-
-        elif item in ["Dress Shirt", "Henley Shirt", "Flannel Shirt",
-                      "Button-Down Shirt",
-                      "Chambray Shirt",
-                      "Oxford Shirt",
-                      "Camp Shirt"]:
-            return "shirt"
-
-        else:
-            return item
-
-    @staticmethod
-    def get_upperwear_tree_long_sleeve() -> list:
         """
-        Retrieves the upperwear clothing classes.
+        Maps a detailed shirt classification to a general class.
+        """
+        shirt_mappings = {
+            "Dress Shirt": "shirt", "Henley Shirt": "shirt", "Flannel Shirt": "shirt",
+            "Button-Down Shirt": "shirt", "Chambray Shirt": "shirt", "Oxford Shirt": "shirt",
+            "Camp Shirt": "shirt", "Hoodie": "sweatshirt", "Baseball Shirt": "sweatshirt",
+            "Crewneck Sweatshirt": "sweatshirt", "Zip-Up Sweatshirt": "sweatshirt",
+            "Pullover Sweatshirt": "sweatshirt", "Polo Shirt": "poloshirt",
+            "T-Shirt": "t-shirt", "Tank Top": "t-shirt"
+        }
+        return shirt_mappings.get(item, item)
+
+    @staticmethod
+    def decide_on_upperwear(item: str) -> str:
+        """
+        Decides on a general upperwear classification based on the detailed item provided.
+        """
+        if item in ["Baseball Shirt"]:
+            return "sweatshirt"
+        elif item in [
+            "Dress Shirt", "Henley Shirt", "Flannel Shirt", "Button-Down Shirt",
+            "Chambray Shirt", "Oxford Shirt", "Camp Shirt"
+        ]:
+            return "shirt"
+        return item
+
+    @staticmethod
+    def get_upperwear_long_sleeve() -> list:
+        """
+        Retrieves upperwear classes with long sleeves.
         ['shirt', 'sweatshirt']
         """
         return ['shirt', 'sweatshirt']
 
     @staticmethod
-    def get_upperwear_tree_short_sleeve() -> list:
+    def get_upperwear_short_sleeve() -> list:
         """
-        Retrieves the upperwear clothing classes.
+        Retrieves upperwear classes with short sleeves.
         ['poloshirt', 't-shirt']
         """
         return ['poloshirt', 't-shirt']
 
+    @staticmethod
     def get_upperwear_tree() -> list:
+        """
+        Retrieves general upperwear classes.
+        ['t-shirt', 'shirt', 'sweatshirt']
+        """
         return ['t-shirt', 'shirt', 'sweatshirt']
 
     @staticmethod
-    def get_long_or_short_sleeve_decision() -> list:
+    def get_sleeve_length_options() -> list:
         """
-        Retrieves the upperwear clothing classes.
-        ['long-sleeve', 'short-sleeve']
+        Retrieves sleeve length options for upperwear.
+        ['shirt', 't-shirt']
         """
         return ['shirt', 't-shirt']
 
     @staticmethod
-    def get_underwear_tree() -> list:
+    def get_lowerwear_classes() -> list:
         """
-        Retrieves the underwear clothing classes.
-        ['long pant', 'short pant', 'skirt']
+        Retrieves lowerwear classes, including pants and skirts.
+        ['jeans', 'trouser', 'sweatpant', 'pant', 'hot pant', 'training short', 'training pant', 'skirt']
         """
         return ['jeans', 'trouser', 'sweatpant', 'pant', 'hot pant', 'training short', 'training pant', 'skirt']
 
     @staticmethod
-    def decide_on_underwear_tree(item) -> str:
+    def decide_on_lowerwear(item: str) -> str:
+        """
+        Decides on a general lowerwear classification based on the item provided.
+        """
         if item in ['hot pant', 'training short']:
             return 'short'
-
         elif item in ['jeans', 'trouser', 'sweatpant', 'training pant']:
             return 'pant'
-        else:
-            return item
+        return item
 
     @staticmethod
-    def swap_out_temp_categories(cloth_obj_main: dict, cloth_obj_sub: dict, current_type: dict, type_to_insert: str, type_to_pop: str) -> dict:
-        max_type = max(cloth_obj_sub, key=cloth_obj_sub.get)
-
+    def swap_temp_categories(
+        main_obj: dict, sub_obj: dict, current_type: list, type_to_insert: str, type_to_pop: str
+    ) -> dict:
+        """
+        Swaps out temporary categories in the main object based on the highest scoring sub-object category.
+        """
+        max_type = max(sub_obj, key=sub_obj.get)
         if max_type in current_type:
-            # Transfer the value from type_to_pop to type_to_insert
-            cloth_obj_main[type_to_insert] = cloth_obj_main.pop(type_to_pop, 0)
-
-        return cloth_obj_main
+            main_obj[type_to_insert] = main_obj.pop(type_to_pop, 0)
+        return main_obj
 
     @staticmethod
-    def get_semantic_skirt_classes():
-        return
+    def get_semantic_skirt_classes() -> list:
+        """
+        Retrieves semantic skirt classes.
+        """
+        return ["Pencil Skirt", "A-Line Skirt", "Pleated Skirt", "Maxi Skirt", "Wrap Skirt"]
 
-    def get_semantics(cloth_type: str):
+    @staticmethod
+    def get_semantic_dress_classes() -> list:
+        """
+        Retrieves semantic dress classes.
+        """
+        return ["A-Line Dress", "Sheath Dress", "Wrap Dress", "Maxi Dress", "Shift Dress"]
+
+    @staticmethod
+    def get_semantics(cloth_type: str) -> list:
+        """
+        Retrieves semantic classes for a given clothing type (e.g., 'skirt' or 'dress').
+        """
         if cloth_type == 'skirt':
-            return ["Pencil Skirt", "A-Line Skirt", "Pleated Skirt", "Maxi Skirt", "Wrap Skirt"]
-
+            return ClothingCategories.get_semantic_skirt_classes()
         elif cloth_type == 'dress':
-            return ["A-Line Dress", "Sheath Dress", "Wrap Dress", "Maxi Dress", "Shift Dress"]
+            return ClothingCategories.get_semantic_dress_classes()
+        return []

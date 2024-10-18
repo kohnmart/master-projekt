@@ -1,8 +1,8 @@
 dataset
-config/__pycache__/*
 Anaconda3-2024.02-1-Linux-x86_64.sh
-src/pipeline/model_weights/*
-src/pipeline/output/*
+src/pipeline/model_weights
+src/output
+src/pipeline/stream_video
 node/node_modules
 .env
-src/pipeline/stream_video/*
+__pycache__/

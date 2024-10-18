@@ -4,6 +4,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '../../')))
 sys_path = sys.path[-1]
 
+import time 
 import cv2
 import numpy as np
 import pandas as pd
@@ -13,7 +14,7 @@ from src.pipeline.modules.cloth_categories import ClothingCategories
 
 from src.pipeline.modules.helper.choices import make_choices
 
-from src.pipeline.modules.helper.loader import load_images_from_folder
+from src.pipeline.modules.helper.loader import load_images_from_folder, load_images_from_folder_with_filter
 from src.pipeline.modules.helper.plotting import plot_images, generate_and_plot_conf
 from src.pipeline.modules.helper.calc import calculate_averages
 
@@ -47,9 +48,12 @@ true_labels = []
 predicted_labels = []
 
 
+start_time = time.time()
+
 ###### CAPTURE RUN ######
 
 for i, keyed_frame in enumerate(images):
+
 
     filename = filenames[i].split('.')[0]
     label = filename.split('_')[1]
@@ -63,9 +67,9 @@ for i, keyed_frame in enumerate(images):
         final_score = child_data['score_tree']
 
     else:
-        final_score = clip_instance.clip_decision_plain(keyed_frame, choices['rotation'])
-
-
+        child_data, parent_score = clip_instance.clip_decision_plain(keyed_frame, choices['rotation'])
+        pred_item = child_data['final_item']
+        final_score = child_data['score_tree']
 
     predicted_labels.append(pred_item)
     cv2.imwrite(f"{full_path}/{filename}_{pred_item}_.jpg", keyed_frame)
@@ -94,6 +98,8 @@ for i, keyed_frame in enumerate(images):
     df_total.to_csv(csv_file)
 
 
+end_time = time.time()
+
 ##### SAVE OUT PLOT ######
 
 print("Creating plot...")
@@ -113,3 +119,10 @@ generate_and_plot_conf(true_labels, predicted_labels, classes, full_path)
 print("Conf matrix saved...")
 
 print("Finished...")
+
+# Calculate average time per inference
+avg_inference_time = (end_time - start_time) / len(filenames)
+
+print(f"Average inference time per run: {avg_inference_time:.6f} seconds")
+
+print(f"total time: {end_time - start_time}")

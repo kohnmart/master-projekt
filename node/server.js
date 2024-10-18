@@ -12,7 +12,7 @@ app.use(express.static('public'));
 app.use(
     '/images',
     express.static(
-        path.join(__dirname, '../dataset/production/setup-v2/jacket-stage-1')
+        path.join(__dirname, '../dataset/production/setup-v2/testset')
     )
 );
 

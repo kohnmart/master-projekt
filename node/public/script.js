@@ -14,18 +14,18 @@ import {
     saveBoundingBoxes,
 } from './canvas.js';
 
-import { getFolderStructure, putImageFileName } from './fetch.js';
+import { putImageFileName } from './fetch.js';
 
 const sampleLengthTotalElement = document.createElement('p');
 sampleLengthTotalElement.id = 'counter';
-const clear = document.getElementById('clearCanvas');
-clear.addEventListener('click', deleteFromCanvas);
+// const clear = document.getElementById('clearCanvas');
+// clear.addEventListener('click', deleteFromCanvas);
 
 let counter = 0;
 
-document
-    .getElementById('addRectangle')
-    .addEventListener('click', enableRectangleDrawing);
+// document
+//     .getElementById('addRectangle')
+//     .addEventListener('click', enableRectangleDrawing);
 
 document
     .getElementById('deleteMarker')
@@ -118,7 +118,7 @@ function addClothTypes() {
 
             document.getElementById('file-name').textContent = new_name;
 
-            canvas.renderAll();
+            //canvas.renderAll();
             btnBeforeId = button.id;
 
             await putImageFileName(name, new_name);

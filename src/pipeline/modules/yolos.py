@@ -6,9 +6,21 @@ import torch
 
 class YOLOSDetector(ObjectDetector):
     """
-    YOLOS Detector class.
-    - Model: 'tiny'
-    - Source: https://huggingface.co/hustvl/yolos-tiny
+    YOLOSDetector Class for Object Detection using the YOLOS Model.
+
+    This class leverages the YOLOS (You Only Look One-level Series) model to perform object detection on input images.
+    It integrates the YOLOS-tiny model from Hugging Face's transformers library for efficient object detection tasks.
+    The class includes methods for image preprocessing, object detection, and post-processing, which extracts and 
+    processes bounding boxes around detected objects.
+
+    Key Features:
+    - Pretrained YOLOS-tiny model for object detection.
+    - Image processing using YOLOSImageProcessor for preparing inputs and post-processing outputs.
+    - Automatic extraction of bounding boxes and cropping of detected objects.
+    - Filtering of valid detections based on size and bounding box criteria.
+
+    This class is designed for real-time or batch object detection, providing utilities for handling model input/output
+    and producing valid detections based on customizable thresholds.
     """
 
     def __init__(self):

@@ -23,6 +23,17 @@ def get_all_samples(cloth_type):
     return file_names
 
 
+def load_images_from_folder_with_filter(folder, filter_by):
+    all_images = []
+    all_file_names = []
+
+    for file_name in os.listdir(folder):
+        if filter_by in file_name:
+            read_image(file_name, all_file_names, all_images, folder)
+
+    return all_images, all_file_names
+
+
 def load_images_from_folder(folder, load_only_false_samples=False):
     all_images = []
     all_file_names = []

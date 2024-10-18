@@ -10,6 +10,21 @@ from matplotlib import patches
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 
 class SAM:
+    """
+    SAM (Segment Anything Model) Class for Image Segmentation and Mask Generation.
+
+    This class provides methods for processing images, generating segmentation masks using the SAM model, 
+    and handling operations like shadow removal, object separation, and bounding box annotation. The class 
+    leverages a ViT-h backbone for automatic mask generation and includes tools for cleaning masks based on 
+    area size, segmenting objects by bounding boxes, and saving the results.
+
+    Key Features:
+    - Automatic mask generation using SAM.
+    - Image preprocessing and shadow removal.
+    - Object separation with bounding box cropping.
+    - Saving annotated images with bounding boxes and labels.
+    """
+
 
     def __init__(self):
         CHECKPOINT_PATH = "./model_weights/sam_vit_h_4b8939.pth"

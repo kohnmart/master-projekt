@@ -48,8 +48,9 @@ yolo_instance = YOLOSDetector()
 file_name = choices['file']
 video_path = os.path.join('./stream_video', file_name)
 
-output_dir = os.path.join('output', choices['concat_name'])
-os.makedirs(output_dir, exist_ok=True)
+export_path = os.path.join(sys_path, "src/output")
+full_path = os.path.join(export_path, choices['concat_name'])
+os.makedirs(full_path, exist_ok=True)
 
 
 
@@ -94,22 +95,25 @@ while cap.isOpened():
         if choices['decision_tree']:
             detection_score, parent_averages = clip_instance.clip_decision_tree(keyed_frame, choices['rotation'])
         else:
-            detection_score = clip_instance.clip_decision_plain(keyed_frame, choices['rotation'])
+            child_data, parent_score = clip_instance.clip_decision_plain(keyed_frame, choices['rotation'])
+            pred_item = child_data['final_item']
+            final_score = child_data['score_tree']
+            print(final_score)
 
         # Check if the same object is detected within the range
         if frame_count - 3 <= last_detection[1]:
-            current_detection_list.append(detection_score)
+            current_detection_list.append(parent_score)
             last_keyed_frame = keyed_frame
             is_last_keyed_frame = True
         else:
-            last_detection = [detection_score, frame_count]
-            current_detection_list.append(detection_score)
+            last_detection = [parent_score, frame_count]
+            current_detection_list.append(parent_score)
             is_last_keyed_frame = False
 
     # If no object is detected, save the last detection
     elif is_detected == False and is_last_keyed_frame == True:
         avg_total, max_item = calculate_averages(current_detection_list)
-        cv2.imwrite(os.path.join(output_dir, f"frame{frame_count}_{max_item}.jpg"), last_keyed_frame)
+        cv2.imwrite(os.path.join(export_path, f"frame{frame_count}_{max_item}.jpg"), last_keyed_frame)
         last_keyed_frame = []
         is_last_keyed_frame = False
         current_detection_list = []
@@ -126,6 +130,6 @@ print('Sequence completed...')
 
 ###### SAVE PLOT ######
 print("Creating plot...")
-images, filenames = load_images_from_folder(output_dir)
-plot_images(images, filenames, output_dir)
+images, filenames = load_images_from_folder(export_path)
+plot_images(images, filenames, export_path)
 print("Plot saved...")
