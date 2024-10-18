@@ -21,8 +21,8 @@ def get_evaluation_path():
 
 def get_checkpoint_path(name=None):
     """Return the path to the directory containing model checkpoint files."""
-    checkpoint_path = os.path.join(get_project_root(), 'src/pipeline/model_weights')
-    if name:
+    checkpoint_path = os.path.join(get_project_root(), 'src/pipeline/model_weights/sam_weights')
+    if 'name':
         checkpoint_path = os.path.join(checkpoint_path, name)
     return checkpoint_path
 

@@ -7,25 +7,14 @@ import {
     imageDelete,
 } from './image.js';
 
-import {
-    canvas,
-    deleteFromCanvas,
-    enableRectangleDrawing,
-    saveBoundingBoxes,
-} from './canvas.js';
+import { saveBoundingBoxes } from './canvas.js';
 
 import { putImageFileName } from './fetch.js';
 
 const sampleLengthTotalElement = document.createElement('p');
 sampleLengthTotalElement.id = 'counter';
-// const clear = document.getElementById('clearCanvas');
-// clear.addEventListener('click', deleteFromCanvas);
 
 let counter = 0;
-
-// document
-//     .getElementById('addRectangle')
-//     .addEventListener('click', enableRectangleDrawing);
 
 document
     .getElementById('deleteMarker')
@@ -104,11 +93,9 @@ function addClothTypes() {
         button.addEventListener('click', async () => {
             if (btnBeforeId != null) {
                 document.getElementById(btnBeforeId).style.borderColor =
-                    'lightgrey'; // Change to 'lightgrey'
+                    'lightgrey';
             }
             button.style.borderColor = 'red';
-            //const rect = canvas.getActiveObject();
-            //rect.set({ label: cloth });
 
             let name = state.images[counter];
 
@@ -130,22 +117,6 @@ function addClothTypes() {
 
     actions.appendChild(div);
 }
-
-/*canvas.on('mouse:down', function (options) {
-    if (options.target && options.target.type === 'rect') {
-        const rect = options.target;
-        const index = clothButtons.find(btn => btn.textContent == rect.label);
-        if (index) {
-            if (btnBefore) {
-                btnBefore.style.borderColor = 'lightgrey';
-            }
-            index.style.borderColor = 'red';
-            btnBefore = index;
-        }
-    } else {
-        btnBefore.style.borderColor = 'lightgrey';
-    }
-});*/
 
 let delStorage = [];
 

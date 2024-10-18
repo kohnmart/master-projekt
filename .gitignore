@@ -4,5 +4,5 @@ src/pipeline/model_weights
 src/output
 src/pipeline/stream_video
 node/node_modules
-.env
+config/.env
 __pycache__/
