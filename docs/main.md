@@ -11,7 +11,6 @@ This project focuses on textile classification using deep learning models. It le
   - [Overview](#overview)
   - [Table of Contents](#table-of-contents)
   - [1. Repository Abstract Structure](#1-repository-abstract-structure)
-  - [1. Repository Abstract Structure](#1-repository-abstract-structure-1)
   - [2. Environment Setup](#2-environment-setup)
     - [Prerequisites:](#prerequisites)
     - [Dataset Download:](#dataset-download)
@@ -35,11 +34,7 @@ This project focuses on textile classification using deep learning models. It le
   - [Helper](#helper)
   - [Utils](#utils)
   - [Plots](#plots)
-
----
-
-## 1. Repository Abstract Structure
-
+  - [IDS Camera Software Package](#ids-camera-software-package)
 
 
 ---
@@ -298,3 +293,11 @@ The **plots/** directory contains visual outputs from various stages of the mode
 - **vit16_rotations.png**: Visualization showing various rotation outputs from the ViT model.
 
 These plots are essential for understanding how well the models are performing under different conditions and transformations.
+
+---
+
+## IDS Camera Software Package
+
+https://de.ids-imaging.com/ids-peak.html
+
+The camera uses a specific version of IDS software suite which can be found in Nextcloud Submission folder as well.
